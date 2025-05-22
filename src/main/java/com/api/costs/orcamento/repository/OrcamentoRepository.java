@@ -1,4 +1,4 @@
-package com.api.costs.repository;
+package com.api.costs.orcamento.repository;
 
 import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
 import com.api.costs.orcamento.Orcamento;

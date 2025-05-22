@@ -3,7 +3,7 @@ package com.api.costs.controllers;
 import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
 import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
 import com.api.costs.orcamento.Orcamento;
-import com.api.costs.repository.OrcamentoRepository;
+import com.api.costs.orcamento.repository.OrcamentoRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
