@@ -21,17 +21,15 @@ public record DadosCadastroOrcamento(
         Categoria categoria,
 
         @Enumerated
-        Status status,
+        Status status
+){
 
-        @Future
-        LocalDate dataCriacao) {
 
         public DadosCadastroOrcamento(Orcamento orcamento) {
                 this(   orcamento.getNome(),
                         orcamento.getValor(),
                         orcamento.getCategoria(),
-                        orcamento.getStatus(),
-                        orcamento.getDataCriacao());
+                        orcamento.getStatus());
         }
 }
 

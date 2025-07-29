@@ -31,6 +31,11 @@ public class OrcamentoController {
         return repository.findAll().stream().map(DadosCadastroOrcamento::new).toList();
     }
 
+    @GetMapping("{/id}")
+    public ResponseEntity<DadosCadastroOrcamento> orcamentoPorId(@PathVariable Long id){
+        return ResponseEntity.ok(new DadosCadastroOrcamento(repository.getReferenceById(id)));
+    }
+
     @GetMapping("/debitado")
     public List<DadosCadastroOrcamento> listarOrcamentosNaoDebitados () {
         return  repository.findAllByDebitadoTrue().stream().map(DadosCadastroOrcamento::new).toList();
@@ -38,9 +43,10 @@ public class OrcamentoController {
 
     @PutMapping
     @Transactional
-    public void atualizarOrcamento (@RequestBody @Valid DadosAtulizarOrcamento dados) {
+    public ResponseEntity<DadosCadastroOrcamento> atualizarOrcamento (@RequestBody @Valid DadosAtulizarOrcamento dados) {
         var orcamento = repository.getReferenceById(dados.id());
         orcamento.atualizarInformacoes(dados);
+        return ResponseEntity.ok(new DadosCadastroOrcamento(orcamento));
     }
 
     @PutMapping("debitado/{id}")
@@ -52,8 +58,9 @@ public class OrcamentoController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public void excluirOrcamento (@PathVariable long id){
+    public ResponseEntity<Void> excluirOrcamento (@PathVariable long id){
         repository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("debitado/{id}")

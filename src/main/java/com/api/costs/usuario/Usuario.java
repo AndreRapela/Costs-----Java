@@ -1,4 +1,4 @@
-package com.api.costs.usuário;
+package com.api.costs.usuario;
 
 import jakarta.persistence.*;
 import lombok.*;

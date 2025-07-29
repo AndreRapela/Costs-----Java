@@ -23,7 +23,6 @@ public class Orcamento {
         this.categoria = dados.categoria();
         this.valor = dados.valor();
         this.status = dados.status();
-        this.dataCriacao = dados.dataCriacao();
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,20 +37,36 @@ public class Orcamento {
     private Status status;
     private LocalDate dataCriacao;
     private boolean debitado;
+    private LocalDate dataAltercao;
 
+    @PrePersist
+    public void SetdataCriacao(){
+        this.dataCriacao = LocalDate.now();
+    }
 
     public void atualizarInformacoes(@Valid DadosAtulizarOrcamento dados) {
+        int cont = 0;
+
         if (dados.nome() != null){
            this.nome = dados.nome();
+           cont++;
         }
 
         if(dados.valor() != null){
             this.valor = dados.valor();
+            cont++;
         }
 
         if(dados.status() != null){
             this.status = dados.status();
+            cont++;
         }
+
+        if(cont>0){
+            this.dataAltercao = LocalDate.now();
+        }
+
+
     }
 
     public void debitar() {
