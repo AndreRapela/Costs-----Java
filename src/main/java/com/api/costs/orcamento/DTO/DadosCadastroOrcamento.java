@@ -5,10 +5,8 @@ import com.api.costs.orcamento.Categoria;
 import com.api.costs.orcamento.Orcamento;
 import com.api.costs.orcamento.Status;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 
-import java.time.LocalDate;
 
 public record DadosCadastroOrcamento(
 

@@ -10,11 +10,9 @@ import java.time.LocalDate;
 
 @Table(name = "tb_orcamento")
 @Entity(name = "orcamentos")
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
 public class Orcamento {
 
     public Orcamento(DadosCadastroOrcamento dados) {

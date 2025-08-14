@@ -1,23 +1,32 @@
-package com.api.costs.infra;
+package com.api.costs.infra.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.method.MethodValidationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.Instant;
+
 @RestControllerAdvice
-public class TratamentoDeErros {
+public class ResourceExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> tratador404 (){
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<StandardError> error404 (EntityNotFoundException e, HttpServletRequest request){
+        StandardError err = new StandardError();
+                err.setTimestamp(Instant.now());
+                err.setStatus(HttpStatus.NOT_FOUND.value());
+                err.setError("Resource not found");
+                err.setMessage(e.getMessage());
+                err.setPath(request.getRequestURI());
+        return ResponseEntity.status(err.getStatus()).body(err);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> tratador400 (MethodArgumentNotValidException ex) {
+    public ResponseEntity<?> error400 (MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body(ex.getFieldErrors().stream().map(Dadoerros::new).toList());
     }
 

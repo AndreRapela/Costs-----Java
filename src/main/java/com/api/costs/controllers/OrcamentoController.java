@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,7 +25,9 @@ public class OrcamentoController {
     @PostMapping
     @Transactional
     public ResponseEntity<Orcamento> cadastrar(@RequestBody @Valid DadosCadastroOrcamento dados){
-        return new ResponseEntity<>(repository.save(new Orcamento(dados)), HttpStatus.CREATED);
+        Orcamento orcamento = repository.save(new Orcamento(dados));
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orcamento.getId()).toUri();
+        return ResponseEntity.created(uri).body(orcamento);
     }
 
     @GetMapping
@@ -31,7 +35,7 @@ public class OrcamentoController {
         return repository.findAll().stream().map(DadosCadastroOrcamento::new).toList();
     }
 
-    @GetMapping("{/id}")
+    @GetMapping("/{id}")
     public ResponseEntity<DadosCadastroOrcamento> orcamentoPorId(@PathVariable Long id){
         return ResponseEntity.ok(new DadosCadastroOrcamento(repository.getReferenceById(id)));
     }
