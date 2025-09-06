@@ -35,6 +35,7 @@ public class Orcamento {
     private Status status;
     private LocalDate dataCriacao;
     private boolean debitado;
+    @Column(name = "data_alteracao")
     private LocalDate dataAltercao;
 
     @PrePersist

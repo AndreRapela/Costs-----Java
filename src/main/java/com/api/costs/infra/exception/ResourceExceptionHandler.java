@@ -15,8 +15,8 @@ import java.time.Instant;
 public class ResourceExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<StandardError> error404 (EntityNotFoundException e, HttpServletRequest request){
-        StandardError err = new StandardError();
+    public ResponseEntity<ApiError> error404 (EntityNotFoundException e, HttpServletRequest request){
+        ApiError err = new ApiError();
                 err.setTimestamp(Instant.now());
                 err.setStatus(HttpStatus.NOT_FOUND.value());
                 err.setError("Resource not found");
@@ -27,13 +27,8 @@ public class ResourceExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> error400 (MethodArgumentNotValidException ex) {
-        return ResponseEntity.badRequest().body(ex.getFieldErrors().stream().map(Dadoerros::new).toList());
+        return ResponseEntity.badRequest().body(ex.getFieldErrors().stream().map(ApiError.FieldValidationError::new).toList());
     }
 
-    public record Dadoerros (String campo, String Mensagem){
 
-        public Dadoerros (FieldError erro ){
-            this(erro.getField(), erro.getDefaultMessage());
-        }
-    }
 }
