@@ -1,0 +1,257 @@
+/* ----------------------------
+   STYLE.GLOBAL para a aplicação
+   ---------------------------- */
+
+/* cores principais */
+:root {
+  --green-dark: #0f6b33;
+  --green-mid: #2e7d32;
+  --glass: rgba(255, 255, 255, 0.92);
+  --muted: #6b6b6b;
+}
+
+/* reset mínimo */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* BACKGROUND: laterais verdes mais fortes, centro mais claro/transparente */
+body {
+  background: radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.96) 0%,
+      rgba(255, 255, 255, 0.92) 28%,
+      rgba(255, 255, 255, 0.85) 45%,
+      rgba(255, 255, 255, 0.7) 55%,
+      transparent 60%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(15, 107, 51, 1) 0%,
+      rgba(46, 125, 50, 1) 16%,
+      rgba(46, 125, 50, 0.55) 35%,
+      rgba(46, 125, 50, 0.55) 65%,
+      rgba(46, 125, 50, 1) 84%,
+      rgba(15, 107, 51, 1) 100%
+    );
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding-top: 70px; /* espaço para navbar fixa */
+}
+
+/* NAVBAR customizada */
+.navbar-custom {
+  background: linear-gradient(90deg, var(--green-dark), var(--green-mid));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  color: #fff;
+}
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+  color: #fff;
+}
+.navbar-custom .nav-link:hover {
+  color: #dcedc8;
+}
+
+/* main shell central */
+.page-shell {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.content-shell {
+  width: min(1080px, 96%);
+  margin: 18px auto;
+  background: var(--glass);
+  border-radius: 12px;
+  padding: 26px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(5px);
+}
+
+/* BRAND (logo + nome) */
+.brand-logo {
+  width: 84px;
+  height: 84px;
+  display: block;
+  margin: 4px auto 8px;
+}
+.brand-logo.small {
+  width: 48px;
+  height: 48px;
+  margin: 0;
+}
+.brand-title {
+  color: var(--green-mid);
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin: 6px 0 10px;
+  text-align: center;
+}
+
+/* ===== LOGIN ===== */
+#loginDiv {
+  max-width: 480px;
+  margin: 6px auto;
+  text-align: center;
+}
+#loginDiv h2 {
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* inputs */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+}
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.08);
+  border-color: var(--green-mid);
+}
+
+/* botoes */
+.btn {
+  border-radius: 8px;
+  font-weight: 600;
+}
+.btn-success {
+  background: var(--green-mid);
+  border: none;
+}
+.btn-success:hover {
+  background: #256628;
+}
+.btn-danger {
+  background: #d9534f;
+  border: none;
+}
+.btn-outline-light {
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* login error */
+#loginError {
+  color: #c62828;
+  margin-top: 8px;
+}
+
+/* ===== ORÇAMENTOS ===== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.page-header h4 {
+  margin: 0;
+  color: #222;
+}
+
+/* GRID DE CARDS */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 35px;
+  align-items: start;
+  margin-top: 25px;
+}
+
+.card {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  padding: 28px;
+  min-height: 250px;
+  width: 300px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* Título com espaçamento */
+.card-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--green-mid);
+  margin-bottom: 18px;
+  margin-right: 50px;
+}
+
+
+/* ===== PAGINAÇÃO ===== */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 35px;
+}
+
+.pagination-container button {
+  border: 2px solid var(--green-mid);
+  background: transparent;
+  color: var(--green-mid);
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+}
+
+.pagination-container button:hover {
+  background: var(--green-mid);
+  color: #fff;
+  transform: scale(1.08);
+  box-shadow: 0 0 8px rgba(46, 125, 50, 0.4);
+}
+
+.pagination-container span {
+  font-weight: 600;
+  color: #444;
+  font-size: 1rem;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 900px) {
+  .brand-title {
+    font-size: 1.6rem;
+  }
+  .content-shell {
+    padding: 18px;
+  }
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* evita IDs conflitantes */
+#btnLogoutTop {
+  display: none;
+}
+@media (max-width: 992px) {
+  #btnLogout {
+    display: none;
+  }
+  #btnLogoutTop {
+    display: inline-block;
+  }
+}
+

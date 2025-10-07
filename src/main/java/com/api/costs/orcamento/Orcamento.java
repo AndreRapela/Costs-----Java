@@ -2,10 +2,12 @@ package com.api.costs.orcamento;
 
 import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
 import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
+import com.api.costs.usuario.Usuario;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Table(name = "tb_orcamento")
@@ -26,7 +28,7 @@ public class Orcamento {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    private Double valor;
+    private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
@@ -37,6 +39,9 @@ public class Orcamento {
     private boolean debitado;
     @Column(name = "data_alteracao")
     private LocalDate dataAltercao;
+
+    @ManyToOne
+    private Usuario usuario;
 
     @PrePersist
     public void SetdataCriacao(){

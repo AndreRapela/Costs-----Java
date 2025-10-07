@@ -1,4 +1,4 @@
-package com.api.costs.usuario.repository;
+package com.api.costs.repository;
 
 
 import com.api.costs.usuario.Usuario;

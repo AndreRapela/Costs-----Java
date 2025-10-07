@@ -2,19 +2,22 @@
 
 API desenvolvida com **Spring Boot 3**, **Java 21** e **MySQL** para gerenciamento de orçamentos, com autenticação JWT e controle de acessos via Spring Security.
 
+---
+
 ## 🚀 Tecnologias utilizadas
 
 - **Java 21**
 - **Spring Boot 3**
-    - Spring Web
-    - Spring Data JPA
-    - Spring Validation
-    - Spring Security
+  - Spring Web
+  - Spring Data JPA
+  - Spring Validation
+  - Spring Security
 - **MySQL**
 - **Flyway** (migrações de banco de dados)
 - **Lombok**
 - **JWT (JSON Web Token)** via [java-jwt](https://github.com/auth0/java-jwt)
 
+---
 
 ## ⚙️ Configuração do Projeto
 
@@ -54,6 +57,8 @@ mvn spring-boot:run
 A API estará disponível em:  
 👉 `http://localhost:8080`
 
+---
+
 ## 🔑 Autenticação
 
 - A autenticação é baseada em **JWT**.
@@ -63,6 +68,8 @@ A API estará disponível em:
 ```http
 Authorization: Bearer <seu_token_aqui>
 ```
+
+---
 
 ## 📌 Endpoints principais
 
@@ -77,6 +84,8 @@ Authorization: Bearer <seu_token_aqui>
 
 - `POST /login` → Realizar login e obter JWT
 
+---
+
 ## 🛠️ Testes
 
 O projeto utiliza **Spring Boot Starter Test** e **Spring Security Test** para testes unitários e de integração.
@@ -89,4 +98,36 @@ mvn test
 
 ---
 
-📌 **Autor**: André Rapela
+## 🏗️ Arquitetura (C4 Model)
+
+A arquitetura do sistema foi documentada utilizando o modelo **C4 (Context, Container, Components)**.
+
+### Nível 1 – Contexto do Sistema
+Mostra como o sistema **Costs** se relaciona com os usuários.
+
+![C4 Nível 1 - Contexto](./img/System%20context%20-%20Costs%20N1.drawio.png)
+
+---
+
+### Nível 2 – Containers
+Mostra os principais containers: SPA (Angular), API (Spring Boot) e Banco de Dados (MySQL).
+
+![C4 Nível 2 - Containers](./img/Container%20Costs%20-%20C4%20N2.drawio.png)
+
+---
+
+### Nível 3 – Componentes
+Mostra os principais componentes da API, incluindo controllers, repositórios, autenticação e handlers de exceções.
+
+![C4 Nível 3 - Componentes](./img/Components%20Costs%20-%20C4%20N3.drawio.png)
+
+---
+
+## 📖 Referências
+
+- O modelo de documentação em C4 foi inspirado no vídeo do canal **Rodrigo Branas**:  
+  [Arquitetura de Software com C4 Model](https://www.youtube.com/watch?v=iWkXd0RJ2FA&t=2966s)
+
+---
+
+📌 **Autor**: André Rapela  

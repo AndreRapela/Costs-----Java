@@ -21,7 +21,6 @@ public class TokenService {
     public String gerarToken(Usuario usuario){
         try {
             var algorithm = Algorithm.HMAC256(secret);
-            System.out.println("O secret esta com valor de ====== " + secret);
             return JWT.create()
                     .withIssuer("Costs")
                     .withSubject(usuario.getLogin())

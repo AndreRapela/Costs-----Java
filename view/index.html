@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Costs</title>
+
+    <!-- Bootstrap CSS + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Seu CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAVBAR (fixa no topo) -->
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+            <img src="costs_logo.png" alt="Costs" width="36" height="36" class="brand-icon">
+            <span class="brand-name">Costs</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navCollapse">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-person-circle"></i>&nbsp;Perfil</a></li>
+                <!-- Botão real de logout (mantém o ID que seu JS usa) -->
+                <li class="nav-item ms-2 d-none d-lg-block"><button id="btnLogout" class="btn btn-sm btn-outline-light">Sair</button></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Conteúdo central -->
+<main class="page-shell">
+    <div class="content-shell container">
+
+        <!-- LOGIN -->
+        <div id="loginDiv" class="text-center">
+            <img src="costs_logo.png" alt="logo" class="brand-logo">
+            <h1 class="brand-title">Costs</h1>
+
+            <h2 class="h4 mb-3">Login</h2>
+
+            <input type="text" id="loginInput" class="form-control mb-2" placeholder="Login">
+            <input type="password" id="senhaInput" class="form-control mb-2" placeholder="Senha">
+
+            <div class="d-flex gap-2 justify-content-center mt-2 mb-2">
+                <button id="btnLogin" class="btn btn-success px-4">Entrar</button>
+
+                <!-- Botão "Sair" visível na tela de login -->
+                <button class="btn btn-outline-danger px-3"
+                        onclick="(function(){ const b = document.getElementById('btnLogout'); if(b) b.click(); })()">
+                    Sair
+                </button>
+            </div>
+
+            <div id="loginError" class="text-danger mt-2"></div>
+        </div>
+
+        <!-- ORÇAMENTOS -->
+        <div id="orcamentosDiv" class="d-none mt-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="costs_logo.png" alt="logo" class="brand-logo small">
+                    <div>
+                        <h2 class="m-0">Costs</h2>
+                        <small class="text-muted">Orçamentos</small>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 align-items-center">
+                    <button id="btnLogoutTop" class="btn btn-danger d-lg-none">Sair</button>
+                    <button id="btnAddOrc" class="btn btn-success" onclick="abrirModalCriar()">
+                        <i class="bi bi-plus-circle"></i> Adicionar Orçamento
+                    </button>
+                </div>
+            </div>
+
+            <div id="loading" class="text-center d-none mb-3">
+                <div class="spinner-border" role="status"></div>
+            </div>
+
+            <!-- container para os cards -->
+            <div id="orcamentos" class="cards-grid"></div>
+
+            <!-- PAGINAÇÃO (agora dentro do orcamentosDiv) -->
+            <!-- PAGINAÇÃO (corrigida e estilizada) -->
+            <div id="paginationControls" class="pagination-container">
+                <button id="prevPage">Anterior</button>
+                <span id="pageInfo">Página 1</span>
+                <button id="nextPage">Próxima</button>
+            </div>
+
+
+        </div>
+    </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal fade" id="orcamentoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orcamentoModalLabel">Novo Orçamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="orcamentoForm">
+                    <input type="hidden" id="orcamentoId">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" id="nome" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Valor</label>
+                        <input type="number" id="valor" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Categoria</label>
+                        <input type="text" id="categoria" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <input type="text" id="status" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="salvarBtn" class="btn btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS e seu script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="login.js"></script>
+</body>
+</html>

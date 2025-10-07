@@ -3,7 +3,7 @@ package com.api.costs.controllers;
 import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
 import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
 import com.api.costs.orcamento.Orcamento;
-import com.api.costs.orcamento.repository.OrcamentoRepository;
+import com.api.costs.repository.OrcamentoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -32,8 +32,10 @@ public class OrcamentoController {
     @Operation(summary = " CADASTRO",
             description = "Cadastra um orçamento passando: String nome , Double valor, Status status(ENUM) , Categoria categoria(Enum) ")
     @ApiResponses (value = {
-            @ApiResponse(responseCode = "200", description = "Orçamento cadastrado com sucesso."),
-            @ApiResponse( responseCode = "400", description = "um ou mais campo(s)  inválido(s).")
+            @ApiResponse(responseCode = "201", description = "Orçamento cadastrado com sucesso."),
+            @ApiResponse(responseCode = "400", description = "um ou mais campo(s)  inválido(s)."),
+            @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes (ex: status inexistente, valor negativo)."),
+            @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados já existe.")
     })
     @PostMapping
     @Transactional
@@ -45,10 +47,7 @@ public class OrcamentoController {
 
     @Operation(summary = "BUSCA COMPLETA",
             description = "Retornar toda a lista de orçamentos , devidamente paginada.")
-    @ApiResponses(value={
-            @ApiResponse(responseCode = "200", description = "Página de lista de orçamentos retornada com sucesso."),
-            @ApiResponse(responseCode = "404", description = "Lista não encontrada.")
-    })
+    @ApiResponse(responseCode = "200", description = "Página de lista de orçamentos retornada com sucesso.")
     @GetMapping
     public ResponseEntity<Page<DadosCadastroOrcamento>> listarOrcamento (Pageable page){
         return ResponseEntity.ok(repository.findAll(page).map(DadosCadastroOrcamento::new));
@@ -67,10 +66,7 @@ public class OrcamentoController {
 
     @Operation(summary = "BUSCA POR NOME",
             description = "Retorna toda a lista paginada de orçamentos com o nome buscado por parametro")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Página de lista de orçamento buscada por nome retornado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Nome não encontrado.")
-    })
+    @ApiResponse(responseCode = "200", description = "Página de lista de orçamento buscada por nome retornado com sucesso")
     @GetMapping("/find")
     public  ResponseEntity<Page<DadosCadastroOrcamento>> orcamentoPorNome(@RequestParam String nome, Pageable page){
         return ResponseEntity.ok(repository.findByNome(nome,page).map(DadosCadastroOrcamento::new));
@@ -86,7 +82,10 @@ public class OrcamentoController {
             "Apenas é possível alterar o String nome, Double valor e o Status status")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200" ,description = "Orçamento atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "um ou mais campo(s) invalido(s).")
+            @ApiResponse(responseCode = "400", description = "um ou mais campo(s) invalido(s)."),
+            @ApiResponse(responseCode = "404", description = "usuário não encontrado."),
+            @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes."),
+            @ApiResponse(responseCode = "409", description = "Conflito ao atualizar orçamento.")
     })
     @PutMapping
     @Transactional

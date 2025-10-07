@@ -1,4 +1,4 @@
-package com.api.costs.orcamento.repository;
+package com.api.costs.repository;
 
 import com.api.costs.orcamento.Orcamento;
 import org.springframework.data.domain.Page;

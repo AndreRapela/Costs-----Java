@@ -6,14 +6,19 @@ import com.api.costs.orcamento.Orcamento;
 import com.api.costs.orcamento.Status;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
 
 
 public record DadosCadastroOrcamento(
 
+        Long id,
+
         @NotBlank
         String nome,
 
-        Double valor,
+        BigDecimal valor,
 
         @Enumerated
         Categoria categoria,
@@ -24,7 +29,8 @@ public record DadosCadastroOrcamento(
 
 
         public DadosCadastroOrcamento(Orcamento orcamento) {
-                this(   orcamento.getNome(),
+                this(   orcamento.getId(),
+                        orcamento.getNome(),
                         orcamento.getValor(),
                         orcamento.getCategoria(),
                         orcamento.getStatus());

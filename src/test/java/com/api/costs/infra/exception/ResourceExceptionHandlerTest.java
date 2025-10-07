@@ -1,22 +1,15 @@
 package com.api.costs.infra.exception;
 
-import com.api.costs.controllers.OrcamentoController;
-import com.api.costs.infra.TokenService;
-import com.api.costs.orcamento.repository.OrcamentoRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +33,32 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar 400 e lista de erros de validação quando dados inválidos forem enviados")
-    void error400() {
+    @DisplayName("Deve retornar 400 e lista de erros de validação quando dados inválidos forem enviados ao cadastrar")
+    void error400AoCadastrar() throws Exception {
+        String valorVazio = "{}";
+
+        mock.perform(post("/costs")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(valorVazio))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].campo").exists())
+                .andExpect(jsonPath("$[0].mensagem").exists());
+
+
+    }
+
+    @Test
+    @DisplayName("Deve retornar 400 e lista de erros de validação quando dados inválidos forem enviados ao atualizar")
+    void error400AoAtualizar() throws Exception {
+        String valorVazio = "{}";
+
+        mock.perform(put("/costs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(valorVazio))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("[0].campo").exists())
+                .andExpect(jsonPath("[0].mensagem").exists());
+
+
     }
 }

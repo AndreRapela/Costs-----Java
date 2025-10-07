@@ -1,6 +1,6 @@
-package com.api.costs.usuario.service;
+package com.api.costs.service;
 
-import com.api.costs.usuario.repository.UsuarioRepository;
+import com.api.costs.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

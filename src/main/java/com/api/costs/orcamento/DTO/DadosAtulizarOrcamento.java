@@ -4,12 +4,14 @@ import com.api.costs.orcamento.Status;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
+
 public record DadosAtulizarOrcamento(
 
         @NotNull
-        long id,
+        Long id,
         String nome,
-        Double valor,
+        BigDecimal valor,
         @Enumerated
         Status status
         ) {

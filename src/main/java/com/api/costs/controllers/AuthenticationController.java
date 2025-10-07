@@ -1,7 +1,7 @@
-package com.api.costs.usuario.controllers;
+package com.api.costs.controllers;
 
-import com.api.costs.infra.TokenService;
 import com.api.costs.infra.DTOTokenJWT;
+import com.api.costs.infra.TokenService;
 import com.api.costs.usuario.DTOs.DadosAuthentication;
 import com.api.costs.usuario.Usuario;
 import jakarta.validation.Valid;
@@ -24,11 +24,16 @@ public class AuthenticationController {
     @Autowired
     private TokenService tokenService;
 
+
+
     @PostMapping
-    public ResponseEntity<?> efetuarLogin (@RequestBody @Valid DadosAuthentication dados) {
+    public ResponseEntity<DTOTokenJWT> efetuarLogin (@RequestBody @Valid DadosAuthentication dados) {
         var token = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
         var autenticacao = manager.authenticate(token);
         var tokenJwt = tokenService.gerarToken((Usuario) autenticacao.getPrincipal());
         return ResponseEntity.ok(new DTOTokenJWT(tokenJwt));
     }
+
+
+
 }
