@@ -35,7 +35,7 @@ public class Usuario implements UserDetails {
     @Size(min = 8, max = 50)
     private String login;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank
     @Size(min = 8, max = 20)
     private String senha;

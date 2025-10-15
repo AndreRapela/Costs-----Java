@@ -74,7 +74,7 @@ class OrcamentoControllerTest {
 
         mockOrcamentoPersistido();
 
-        ResponseEntity<Orcamento> response = controller.cadastrar(dados);
+        ResponseEntity<Orcamento> response = controller.cadastrarOrcamento(dados);
 
         assertNotNull(response.getBody());
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -86,7 +86,7 @@ class OrcamentoControllerTest {
 
         mockOrcamentoPersistido().setId(1L);
 
-        ResponseEntity<Orcamento> response = controller.cadastrar(dados);
+        ResponseEntity<Orcamento> response = controller.cadastrarOrcamento(dados);
 
         Orcamento orcamento = response.getBody();
 

@@ -41,6 +41,7 @@ public class Orcamento {
     private LocalDate dataAltercao;
 
     @ManyToOne
+    @JoinColumn(name = "user_id" , nullable = false, updatable = false)
     private Usuario usuario;
 
     @PrePersist

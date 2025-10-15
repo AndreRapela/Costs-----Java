@@ -10,7 +10,7 @@ public enum Status {
 
     @JsonCreator
     public static Status fromString(String value){
-        return value == null ? null : Status.fromString(value.toUpperCase());
+        return value == null ? null : Status.valueOf(value.toUpperCase());
     }
 
     @JsonValue

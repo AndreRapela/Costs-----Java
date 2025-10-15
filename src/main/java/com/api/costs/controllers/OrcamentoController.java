@@ -4,6 +4,7 @@ import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
 import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
 import com.api.costs.orcamento.Orcamento;
 import com.api.costs.repository.OrcamentoRepository;
+import com.api.costs.service.OrcamentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,55 +29,107 @@ import java.net.URI;
 public class OrcamentoController {
 
     @Autowired
-    private OrcamentoRepository repository;
+    private OrcamentoService service;
 
-    @Operation(summary = " CADASTRO",
-            description = "Cadastra um orçamento passando: String nome , Double valor, Status status(ENUM) , Categoria categoria(Enum) ")
+
+    @Operation(summary = " CADASTRO ORÇAMENTO POR USUÁRIO",
+            description = "Cadastra um orçamento do usuário atual passando:" +
+                    " String nome , Double valor, Status status(ENUM) , Categoria categoria(Enum) ")
     @ApiResponses (value = {
+            @ApiResponse(responseCode = "201", description = "Orçamento cadastrado com sucesso."),
+            @ApiResponse(responseCode = "400", description = "um ou mais campo(s)  inválido(s)."),
+            @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes (ex: status inexistente, valor negativo)."),
+            @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados já existe."),
+    })
+    @PostMapping
+    public ResponseEntity<Orcamento> cadastrarOrcamentosPorUsuario(@RequestBody @Valid DadosCadastroOrcamento dados, Authentication authentication){
+        Orcamento orcamento = service.cadastrarOrcamentosPorUsuario(dados, authentication);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orcamento.getId()).toUri();
+        return ResponseEntity.created(uri).body(orcamento);
+    }
+
+
+    @Operation(summary = "CADASTRAR USUÁRIO",
+            description = "Cadastra um orçamento do usuário atual passando: " +
+                    "String nome, Double valor, Status status(ENUM), Categoria categoria(ENUM)")
+    @ApiResponses(value ={
             @ApiResponse(responseCode = "201", description = "Orçamento cadastrado com sucesso."),
             @ApiResponse(responseCode = "400", description = "um ou mais campo(s)  inválido(s)."),
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes (ex: status inexistente, valor negativo)."),
             @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados já existe.")
     })
-    @PostMapping
-    @Transactional
-    public ResponseEntity<Orcamento> cadastrar(@RequestBody @Valid DadosCadastroOrcamento dados){
-        Orcamento orcamento = repository.save(new Orcamento(dados));
+    @PostMapping("/admin")
+    public ResponseEntity<Orcamento> cadastrarOrcamentos(@RequestBody @Valid DadosCadastroOrcamento dados){
+        Orcamento orcamento =  service.cadastrarOrcamentos(dados);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orcamento.getId()).toUri();
-        return ResponseEntity.created(uri).body(orcamento);
+        return  ResponseEntity.created(uri).body(orcamento);
     }
 
-    @Operation(summary = "BUSCA COMPLETA",
+
+    @Operation(summary = "BUSCA COMPLETA DE ORÇAMENTOS",
             description = "Retornar toda a lista de orçamentos , devidamente paginada.")
-    @ApiResponse(responseCode = "200", description = "Página de lista de orçamentos retornada com sucesso.")
-    @GetMapping
-    public ResponseEntity<Page<DadosCadastroOrcamento>> listarOrcamento (Pageable page){
-        return ResponseEntity.ok(repository.findAll(page).map(DadosCadastroOrcamento::new));
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página de lista de orçamentos retornada com sucesso."),
+            @ApiResponse(responseCode = "404", description = "lista não encontrada.")
+    })
+    @GetMapping("/admin")
+    public ResponseEntity<Page<DadosCadastroOrcamento>> listarOrcamentos (Pageable page){
+        return ResponseEntity.ok(service.listarOrcamentos(page));
     }
+
+
+    @Operation(summary = "BUSCA DE ORÇAMENTOS POR USUÁRIO",
+                description = "Retorna a lista completa de orçamentos paginada do priprio usuário")
+    @ApiResponses(value ={
+            @ApiResponse(responseCode = "200", description = "Página de lista do usuário retornada com sucesso!"),
+            @ApiResponse(responseCode = "404", description = "Lista não encontrada.")
+    })
+    @GetMapping
+    public ResponseEntity<Page<DadosCadastroOrcamento>> listarOrcamentoPorUsuario (Authentication authentication, Pageable page){
+        return ResponseEntity.ok(service.listarOrçamentosPorUsuario(authentication, page));
+    }
+
 
     @Operation(summary = "BUSCA POR ID",
             description = "Retorna um orçamento específico passando o id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Orçamento buscado por id encontrado com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Pagina de orçamentos buscado por id encontrado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Orçamento não encontrado.")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<DadosCadastroOrcamento> orcamentoPorId(@PathVariable Long id){
-        return ResponseEntity.ok(new DadosCadastroOrcamento(repository.getReferenceById(id)));
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<DadosCadastroOrcamento> buscarOrcamentoPorId(@PathVariable Long id){
+        return ResponseEntity.ok(service.buscarOrcamentoPorId(id));
     }
+
+
+    @Operation(summary = "BUSCAR POR NOME POR USUÁRIO",
+            description = "Retorna uma lista paginada de orçamentos com o nome buscado por paramentros do proprio usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200" , description = "Página de orçamento buscado por nome encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Página não encontrada")
+    })
+    @GetMapping("/find")
+    public ResponseEntity<Page<DadosCadastroOrcamento>> buscarOrcamentoPorUsuarioPorId(Authentication authentication,@RequestParam String nome, Pageable page){
+        return ResponseEntity.ok(service.buscarOrcamentoPorNomePorUsuario(authentication,nome,page));
+    }
+
 
     @Operation(summary = "BUSCA POR NOME",
             description = "Retorna toda a lista paginada de orçamentos com o nome buscado por parametro")
-    @ApiResponse(responseCode = "200", description = "Página de lista de orçamento buscada por nome retornado com sucesso")
-    @GetMapping("/find")
+    @ApiResponses( value = {
+            @ApiResponse(responseCode = "200", description = "Página de lista de orçamento buscada por nome retornado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Página não encontrada")
+    })
+   @GetMapping("admin/find")
     public  ResponseEntity<Page<DadosCadastroOrcamento>> orcamentoPorNome(@RequestParam String nome, Pageable page){
-        return ResponseEntity.ok(repository.findByNome(nome,page).map(DadosCadastroOrcamento::new));
+        return ResponseEntity.ok(service.buscarOrcamentoPorNome(nome,page));
     }
 
 //    @GetMapping("/debitado")
 //    public List<DadosCadastroOrcamento> listarOrcamentosNaoDebitados () {
 //        return  repository.findAllByDebitadoTrue().stream().map(DadosCadastroOrcamento::new).toList();
 //    }
+
 
     @Operation(summary = "EDIÇÃO DE ORÇAMENTO",
             description = "Altera um orçamento existente passando o id Long. " +
@@ -88,12 +142,25 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "409", description = "Conflito ao atualizar orçamento.")
     })
     @PutMapping
-    @Transactional
     public ResponseEntity<DadosCadastroOrcamento> atualizarOrcamento (@RequestBody @Valid DadosAtulizarOrcamento dados) {
-        var orcamento = repository.getReferenceById(dados.id());
-        orcamento.atualizarInformacoes(dados);
-        return ResponseEntity.ok(new DadosCadastroOrcamento(orcamento));
+        return ResponseEntity.ok(service.atualizarOrcamento(dados));
     }
+
+
+    @Operation(summary = "EDIÇÃO DE ORÇAMENTO POR USUÁRIO", description = "Altera um orçamento existente do próprio usuário passando o id Long" +
+            "Apenas é possível alterar o String nome, Double valor e o Status status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Orçamento atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "um ou mais campo(s) inválido(s)."),
+            @ApiResponse(responseCode = "404", description = "usuário não encontrado."),
+            @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes."),
+            @ApiResponse(responseCode = "409", description = "conflito ao atualizar orçamento.")
+    })
+    @PutMapping
+    public ResponseEntity<DadosCadastroOrcamento> atualizarOrcamentoPorUsuario(Authentication authentication ,@RequestBody @Valid DadosAtulizarOrcamento dados){
+        return ResponseEntity.ok(service.atulizarOrcamentoPorUsuario(authentication,dados));
+    }
+
 
 //    @PutMapping("debitado/{id}")
 //    @Transactional
@@ -101,17 +168,31 @@ public class OrcamentoController {
 //        var orcamento = repository.getReferenceById(id);
 //        orcamento.registar();
 //    }
+
+
     @Operation(summary = "EXCLUSÃO DE ORÇAMENTO",
             description = "Exclui um orçamento existente passando o id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204" , description = "Nenhum conteúdo encontrado, sendo bem sucedido ou não"),
     })
-    @DeleteMapping("/{id}")
-    @Transactional
+    @DeleteMapping("/admin/{id}")
     public ResponseEntity<Void> excluirOrcamento (@PathVariable long id){
-        repository.deleteById(id);
+        service.excluirOrcamento(id);
         return ResponseEntity.noContent().build();
     }
+
+
+    @Operation(summary = "EXCLUSÃO DE ORÇAMENTO PELO PRORPIO USUÁRIO",
+            description = "Excluir um orçamento do proprio usuário passando o id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Nenhum conteúdo encontrado, sendo bem sucedido"),
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirOrcamentoPorUsuario(@PathVariable Long id, Authentication authentication){
+        service.excluirOrcamentoPorUsuario(id,authentication);
+        return ResponseEntity.noContent().build();
+    }
+
 
 //    @DeleteMapping("debitado/{id}")
 //    @Transactional
@@ -119,5 +200,7 @@ public class OrcamentoController {
 //        var orcamento = repository.getReferenceById(id);
 //        orcamento.debitar();
 //    }
-    
+
+
+
 }

@@ -21,44 +21,62 @@ class ResourceExceptionHandlerTest {
     MockMvc mock;
 
     @Test
-    @DisplayName("Deve retornar erro 404 quando o recurso não for encontrado")
-    void error404() throws Exception {
-        mock.perform(get("/costs/9999"))
+    @DisplayName("Deve retornar 404 quando EntityNotFoundException for lançada")
+    void test404() throws Exception {
+        mockMvc.perform(get("/fake/not-found"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Resource not found"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.path").exists());
-
+                .andExpect(jsonPath("$.message").value("Recurso não encontrado no banco"))
+                .andExpect(jsonPath("$.path").value("/fake/not-found"));
     }
 
     @Test
-    @DisplayName("Deve retornar 400 e lista de erros de validação quando dados inválidos forem enviados ao cadastrar")
-    void error400AoCadastrar() throws Exception {
-        String valorVazio = "{}";
-
-        mock.perform(post("/costs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(valorVazio))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0].campo").exists())
-                .andExpect(jsonPath("$[0].mensagem").exists());
-
-
+    @DisplayName("Deve retornar 422 quando ocorrer MethodArgumentNotValidException")
+    void test422() throws Exception {
+        mockMvc.perform(get("/fake/validation"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.status").value(422))
+                .andExpect(jsonPath("$.error").value("Validation failed"))
+                .andExpect(jsonPath("$.message").value("Campo(s) invalido(s)"))
+                .andExpect(jsonPath("$.path").value("/fake/validation"));
     }
 
     @Test
-    @DisplayName("Deve retornar 400 e lista de erros de validação quando dados inválidos forem enviados ao atualizar")
-    void error400AoAtualizar() throws Exception {
-        String valorVazio = "{}";
-
-        mock.perform(put("/costs")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(valorVazio))
+    @DisplayName("Deve retornar 400 quando ocorrer ConstraintViolationException")
+    void test400() throws Exception {
+        mockMvc.perform(get("/fake/constraint"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("[0].campo").exists())
-                .andExpect(jsonPath("[0].mensagem").exists());
-
-
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Invalid request params"))
+                .andExpect(jsonPath("$.message").value("Parâmetros inválidos na requisição"))
+                .andExpect(jsonPath("$.path").value("/fake/constraint"));
     }
+
+    @Test
+    @DisplayName("Deve retornar 409 quando ocorrer DataIntegrityViolationException")
+    void test409() throws Exception {
+        mockMvc.perform(get("/fake/integrity"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.error").value("Data Integrity violation"))
+                .andExpect(jsonPath("$.message", containsString("Operação não pode ser concluída")))
+                .andExpect(jsonPath("$.path").value("/fake/integrity"));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 500 e incluir stackTrace quando ocorrer Exception genérica")
+    void test500() throws Exception {
+        mockMvc.perform(get("/fake/unexpected"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Unexpexted error"))
+                .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado!"))
+                .andExpect(jsonPath("$.path").value("/fake/unexpected"))
+                .andExpect(jsonPath("$.stackTrace").exists())
+                .andExpect(jsonPath("$.stackTrace", containsString("RuntimeException")))
+                .andExpect(jsonPath("$.stackTrace", containsString("Erro inesperado no servidor")));
+    }
+}
+
 }
