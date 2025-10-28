@@ -51,7 +51,7 @@ public class ResourceExceptionHandler {
 
         ApiError err = new ApiError();
         err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        err.setError("Unexpexted error");
+        err.setError("Unexpected error");
         err.setMessage("Ocorreu um erro inesperado!");
         err.setPath(request.getRequestURI());
 

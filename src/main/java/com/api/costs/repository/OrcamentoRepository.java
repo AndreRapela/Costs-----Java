@@ -19,7 +19,7 @@ public interface OrcamentoRepository extends JpaRepository<Orcamento,Long> {
 
     Page<Orcamento> findByUsuario (Usuario usuario, Pageable pageable);
 
-    Page<Orcamento> findByUsuarioByNome(Usuario usuario , String nome, Pageable page);
+    Page<Orcamento> findByUsuarioAndNomeContaining(Usuario usuario , String nome, Pageable page);
 
     Optional<Orcamento> findByUsuarioAndId (Usuario usuario, Long id);
 

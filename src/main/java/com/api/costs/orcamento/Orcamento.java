@@ -37,11 +37,12 @@ public class Orcamento {
     private Status status;
     private LocalDate dataCriacao;
     private boolean debitado;
+
     @Column(name = "data_alteracao")
     private LocalDate dataAltercao;
 
     @ManyToOne
-    @JoinColumn(name = "user_id" , nullable = false, updatable = false)
+    @JoinColumn(name = "usuario_id" , nullable = false, updatable = false)
     private Usuario usuario;
 
     @PrePersist

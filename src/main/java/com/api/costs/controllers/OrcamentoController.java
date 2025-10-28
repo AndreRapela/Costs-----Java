@@ -39,7 +39,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "201", description = "Orçamento cadastrado com sucesso."),
             @ApiResponse(responseCode = "400", description = "um ou mais campo(s)  inválido(s)."),
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes (ex: status inexistente, valor negativo)."),
-            @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados já existe."),
+            @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados. Já existente."),
     })
     @PostMapping
     public ResponseEntity<Orcamento> cadastrarOrcamentosPorUsuario(@RequestBody @Valid DadosCadastroOrcamento dados, Authentication authentication){
@@ -86,7 +86,7 @@ public class OrcamentoController {
     })
     @GetMapping
     public ResponseEntity<Page<DadosCadastroOrcamento>> listarOrcamentoPorUsuario (Authentication authentication, Pageable page){
-        return ResponseEntity.ok(service.listarOrçamentosPorUsuario(authentication, page));
+        return ResponseEntity.ok(service.listarOrcamentosPorUsuario(authentication, page));
     }
 
 
@@ -109,7 +109,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Página não encontrada")
     })
     @GetMapping("/find")
-    public ResponseEntity<Page<DadosCadastroOrcamento>> buscarOrcamentoPorUsuarioPorId(Authentication authentication,@RequestParam String nome, Pageable page){
+    public ResponseEntity<Page<DadosCadastroOrcamento>> buscarOrcamentoPorUsuarioPorNome(Authentication authentication,@RequestParam String nome, Pageable page){
         return ResponseEntity.ok(service.buscarOrcamentoPorNomePorUsuario(authentication,nome,page));
     }
 
@@ -121,9 +121,10 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Página não encontrada")
     })
    @GetMapping("admin/find")
-    public  ResponseEntity<Page<DadosCadastroOrcamento>> orcamentoPorNome(@RequestParam String nome, Pageable page){
+    public  ResponseEntity<Page<DadosCadastroOrcamento>> buscarOrcamentoPorNome(@RequestParam String nome, Pageable page){
         return ResponseEntity.ok(service.buscarOrcamentoPorNome(nome,page));
     }
+
 
 //    @GetMapping("/debitado")
 //    public List<DadosCadastroOrcamento> listarOrcamentosNaoDebitados () {
@@ -139,9 +140,8 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "400", description = "um ou mais campo(s) invalido(s)."),
             @ApiResponse(responseCode = "404", description = "usuário não encontrado."),
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes."),
-            @ApiResponse(responseCode = "409", description = "Conflito ao atualizar orçamento.")
     })
-    @PutMapping
+    @PutMapping("/admin")
     public ResponseEntity<DadosCadastroOrcamento> atualizarOrcamento (@RequestBody @Valid DadosAtulizarOrcamento dados) {
         return ResponseEntity.ok(service.atualizarOrcamento(dados));
     }
@@ -152,9 +152,7 @@ public class OrcamentoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Orçamento atualizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "um ou mais campo(s) inválido(s)."),
-            @ApiResponse(responseCode = "404", description = "usuário não encontrado."),
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes."),
-            @ApiResponse(responseCode = "409", description = "conflito ao atualizar orçamento.")
     })
     @PutMapping
     public ResponseEntity<DadosCadastroOrcamento> atualizarOrcamentoPorUsuario(Authentication authentication ,@RequestBody @Valid DadosAtulizarOrcamento dados){
@@ -188,8 +186,8 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "204", description = "Nenhum conteúdo encontrado, sendo bem sucedido"),
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluirOrcamentoPorUsuario(@PathVariable Long id, Authentication authentication){
-        service.excluirOrcamentoPorUsuario(id,authentication);
+    public ResponseEntity<Void> excluirOrcamentoPorUsuario(Authentication authentication, @PathVariable Long id){
+        service.excluirOrcamentoPorUsuario(authentication, id);
         return ResponseEntity.noContent().build();
     }
 

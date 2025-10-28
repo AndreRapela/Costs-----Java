@@ -4,6 +4,7 @@ package com.api.costs.orcamento.DTO;
 import com.api.costs.orcamento.Categoria;
 import com.api.costs.orcamento.Orcamento;
 import com.api.costs.orcamento.Status;
+import com.api.costs.usuario.Usuario;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,10 @@ public record DadosCadastroOrcamento(
         Categoria categoria,
 
         @Enumerated
-        Status status
+        Status status,
+
+       @NotBlank
+       Long usuarioId
 ){
 
 
@@ -33,7 +37,9 @@ public record DadosCadastroOrcamento(
                         orcamento.getNome(),
                         orcamento.getValor(),
                         orcamento.getCategoria(),
-                        orcamento.getStatus());
+                        orcamento.getStatus(),
+                        orcamento.getUsuario().getId()
+                );
         }
 }
 
