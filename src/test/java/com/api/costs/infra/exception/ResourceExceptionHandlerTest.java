@@ -82,11 +82,11 @@ class ResourceExceptionHandlerTest {
     void test500() throws Exception {
         mock.perform(get("/fake/unexpected"))
                 .andExpect(status().isInternalServerError())
-                .andExpectAll(defaultErrorExpectations(500,"Unexpected error",
+                .andExpectAll(defaultErrorExpectations(500,"Unexpected error!!!!!",
                         "Ocorreu um erro inesperado!","/fake/unexpected"))
                 .andExpect(jsonPath("$.stackTrace").exists())
                 .andExpect(jsonPath("$.stackTrace",containsString("RuntimeException")))
-                .andExpect(jsonPath("$.stackTrace",containsString("Erro inesperado no servidor")));
+                .andExpect(jsonPath("$.stackTrace",containsString("Erro inesperado no servidor!!!!!")));
 }
 
 }

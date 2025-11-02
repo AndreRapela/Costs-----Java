@@ -14,9 +14,7 @@ import java.math.BigDecimal;
 
 public record DadosCadastroOrcamento(
 
-        Long id,
-
-        @NotBlank
+               @NotBlank
         String nome,
 
         BigDecimal valor,
@@ -33,8 +31,7 @@ public record DadosCadastroOrcamento(
 
 
         public DadosCadastroOrcamento(Orcamento orcamento) {
-                this(   orcamento.getId(),
-                        orcamento.getNome(),
+                this(   orcamento.getNome(),
                         orcamento.getValor(),
                         orcamento.getCategoria(),
                         orcamento.getStatus(),

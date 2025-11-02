@@ -1,9 +1,12 @@
 package com.api.costs.usuario;
 
 import com.api.costs.orcamento.Orcamento;
+import com.api.costs.usuario.DTOs.DadosAtualizarUsuario;
 import com.api.costs.usuario.DTOs.DadosCadastroUsuario;
+import com.api.costs.usuario.DTOs.DadosListarUsuario;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -22,10 +25,12 @@ import java.util.List;
 @Data
 public class Usuario implements UserDetails {
 
+
     public Usuario(DadosCadastroUsuario dados) {
         this.login = dados.login();
-        this.orcamentos = dados.orcamentos();
+        this.senha = dados.senha();
     }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,4 +62,10 @@ public class Usuario implements UserDetails {
     public String getUsername() {
         return login;
     }
+
+
+    public void atualizarSenha (DadosAtualizarUsuario dados){
+        this.senha = dados.senha();
+    }
+
 }

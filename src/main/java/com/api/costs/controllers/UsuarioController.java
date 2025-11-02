@@ -3,6 +3,7 @@ package com.api.costs.controllers;
 import com.api.costs.service.UsuarioService;
 import com.api.costs.usuario.DTOs.DadosAtualizarUsuario;
 import com.api.costs.usuario.DTOs.DadosCadastroUsuario;
+import com.api.costs.usuario.DTOs.DadosListarUsuario;
 import com.api.costs.usuario.Usuario;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,8 +53,8 @@ public class UsuarioController {
         @ApiResponse(responseCode = "404", description = "Lista de usuários não encontrada.")
     })
     @GetMapping("/admin")
-    public ResponseEntity<Page<DadosCadastroUsuario>> buscarUsuarios (Pageable page){
-        return ResponseEntity.ok(service.buscarUsuarios(page));
+    public ResponseEntity<Page<DadosListarUsuario>> listarUsuarios (Pageable page){
+        return ResponseEntity.ok(service.listarUsuarios(page));
     }
 
 
@@ -64,8 +65,8 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Lista de usuários não encontrada!")
     })
     @GetMapping("/admin/find")
-    public ResponseEntity<Page<DadosCadastroUsuario>> buscarUsuariosPorLogin (Pageable page,@RequestParam String nome){
-        return  ResponseEntity.ok(service.buscarUsuarioPorNome(page,nome));
+    public ResponseEntity<DadosListarUsuario> buscarUsuarioPorLogin ( @RequestParam String login){
+        return  ResponseEntity.ok(service.buscarUsuarioPorLogin(login));
     }
 
 
@@ -76,7 +77,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Falha ao encontrar o usuário!")
     })
     @GetMapping("/admin/{id}")
-    public ResponseEntity<DadosCadastroUsuario> buscarUsuarioPorId (@PathVariable Long id){
+    public ResponseEntity<DadosListarUsuario> buscarUsuarioPorId (@PathVariable Long id){
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 

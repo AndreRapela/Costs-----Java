@@ -6,17 +6,16 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
-
-public record DadosCadastroUsuario (
+public record DadosListarUsuario (
 
         @NotBlank
         String login,
 
-        @NotBlank
-        String senha
-){
+        List<Orcamento> orcamentos
 
-    public DadosCadastroUsuario (Usuario usuario){
-        this (usuario.getLogin(), usuario.getSenha());
+){
+    public DadosListarUsuario(Usuario usuario){
+        this(usuario.getLogin(),usuario.getOrcamentos());
     }
+
 }

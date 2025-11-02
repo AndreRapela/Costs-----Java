@@ -3,6 +3,7 @@ package com.api.costs.service;
 import com.api.costs.repository.UsuarioRepository;
 import com.api.costs.usuario.DTOs.DadosAtualizarUsuario;
 import com.api.costs.usuario.DTOs.DadosCadastroUsuario;
+import com.api.costs.usuario.DTOs.DadosListarUsuario;
 import com.api.costs.usuario.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,25 +38,25 @@ public class UsuarioService {
     }
 
 
-    public Page<DadosCadastroUsuario> buscarUsuarios(Pageable page){
-        return repository.findAll(page).map(DadosCadastroUsuario::new);
+    public Page<DadosListarUsuario> listarUsuarios(Pageable page){
+        return repository.findAll(page).map(DadosListarUsuario::new);
     }
 
 
-    public Page<DadosCadastroUsuario> buscarUsuarioPorNome(Pageable page, String nome){
-        return repository.findByLogin(page, nome).map(DadosCadastroUsuario::new);
+    public DadosListarUsuario buscarUsuarioPorLogin( String login){
+        return new DadosListarUsuario(repository.findByLogin(login));
     }
 
 
-    public DadosCadastroUsuario buscarPorId(Long id){
-        return new DadosCadastroUsuario(repository.getReferenceById(id));
+    public DadosListarUsuario buscarPorId(Long id){
+        return new DadosListarUsuario(repository.getReferenceById(id));
     }
 
 
     @Transactional
     public DadosCadastroUsuario atualizarSenha(DadosAtualizarUsuario dados){
         Usuario usuario = repository.getReferenceById(dados.id());
-        usuario.setSenha(dados.senha());
+        usuario.atualizarSenha(dados);
         return new DadosCadastroUsuario(usuario);
     }
 
@@ -63,7 +64,8 @@ public class UsuarioService {
     @Transactional
     public DadosCadastroUsuario atualizarSenhaDoUsuario(Authentication authentication,DadosAtualizarUsuario dados){
         Usuario usuario = getUsuarioLogado(authentication);
-        usuario.setSenha(dados.senha());
+        usuario.atualizarSenha(dados);
+        repository.save(usuario);
         return  new DadosCadastroUsuario(usuario);
     }
 

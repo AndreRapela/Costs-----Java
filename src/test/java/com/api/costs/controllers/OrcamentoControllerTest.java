@@ -56,13 +56,13 @@ class OrcamentoControllerTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
         dados = new DadosCadastroOrcamento
-                ( 1L,"energia", BigDecimal.valueOf(200), Categoria.DEBITO, Status.PENDENTE,1L);
+                ( "energia", BigDecimal.valueOf(200), Categoria.DEBITO, Status.PENDENTE,1L);
         orcamento = new Orcamento(dados);
         orcamento.setId(1L);
         page = new PageImpl<>(List.of(dados));
         dadosAtualizados = new DadosAtulizarOrcamento(1L, "água", BigDecimal.valueOf(300), Status.ABATIDO);
         retorno = new DadosCadastroOrcamento
-                (1L, "água", BigDecimal.valueOf(300),Categoria.DEBITO, Status.ABATIDO,1L);
+                ("água", BigDecimal.valueOf(300),Categoria.DEBITO, Status.ABATIDO,1L);
 
     }
 
