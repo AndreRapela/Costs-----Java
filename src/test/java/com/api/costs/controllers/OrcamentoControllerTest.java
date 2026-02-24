@@ -2,26 +2,23 @@ package com.api.costs.controllers;
 
 import com.api.costs.orcamento.Categoria;
 import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
-import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
+import com.api.costs.orcamento.DTO.DadosCadastroOrcamentoAdmin;
 import com.api.costs.orcamento.Orcamento;
 import com.api.costs.orcamento.Status;
-import com.api.costs.repository.OrcamentoRepository;
 import com.api.costs.service.OrcamentoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,7 +28,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-
+@WebMvcTest(MockitoExtension.class)
 class OrcamentoControllerTest {
 
     @Mock
@@ -43,25 +40,22 @@ class OrcamentoControllerTest {
     @InjectMocks
     OrcamentoController controller;
 
-    private DadosCadastroOrcamento dados;
+    private DadosCadastroOrcamentoAdmin dados;
     private  Orcamento orcamento;
-    private Page<DadosCadastroOrcamento> page;
+    private Page<DadosCadastroOrcamentoAdmin> page;
     private DadosAtulizarOrcamento dadosAtualizados;
-    private DadosCadastroOrcamento retorno;
+    private DadosCadastroOrcamentoAdmin retorno;
 
     @BeforeEach
     void CriarDTO(){
-        MockitoAnnotations.openMocks(this);
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        dados = new DadosCadastroOrcamento
+        dados = new DadosCadastroOrcamentoAdmin
                 ( "energia", BigDecimal.valueOf(200), Categoria.DEBITO, Status.PENDENTE,1L);
         orcamento = new Orcamento(dados);
         orcamento.setId(1L);
         page = new PageImpl<>(List.of(dados));
         dadosAtualizados = new DadosAtulizarOrcamento(1L, "água", BigDecimal.valueOf(300), Status.ABATIDO);
-        retorno = new DadosCadastroOrcamento
+        retorno = new DadosCadastroOrcamentoAdmin
                 ("água", BigDecimal.valueOf(300),Categoria.DEBITO, Status.ABATIDO,1L);
 
     }
@@ -70,33 +64,37 @@ class OrcamentoControllerTest {
     @Test
     @DisplayName("Deve retornar o status 201 quando cadastrar um orçamento do usuário logado")
     void cadastrarOrcamentoPorUsuario(){
-        when(service.cadastrarOrcamentosPorUsuario(any(DadosCadastroOrcamento.class),any(Authentication.class)))
+        when(service.cadastrarOrcamentosPorUsuario(any(DadosCadastroOrcamentoAdmin.class),any(Authentication.class)))
                 .thenReturn(orcamento);
 
-        ResponseEntity<Orcamento> response = controller.cadastrarOrcamentosPorUsuario(dados,authentication);
+        ResponseEntity<DadosCadastroOrcamentoAdmin> response = controller.cadastrarOrcamentosPorUsuario(dados,authentication);
 
         assertAll("validação dos campos do orçamento retornado",
-                () -> assertEquals(1L, response.getBody().getId()),
-                () -> assertEquals("energia", response.getBody().getNome()),
-                () -> assertEquals(BigDecimal.valueOf(200), response.getBody().getValor()),
-                () -> assertEquals(Categoria.DEBITO, response.getBody().getCategoria()),
-                () -> assertEquals(Status.PENDENTE, response.getBody().getStatus()));
+                () -> assertEquals(1L, response.getBody().usuarioId()),
+                () -> assertEquals("energia", response.getBody().nome()),
+                () -> assertEquals(BigDecimal.valueOf(200), response.getBody().valor()),
+                () -> assertEquals(Categoria.DEBITO, response.getBody().categoria()),
+                () -> assertEquals(Status.PENDENTE, response.getBody().status()),
+                () -> assertEquals(HttpStatus.CREATED, response.getStatusCode()),
+                () -> assertNotNull(response.getHeaders().getLocation()));
+
     }
 
 
     @Test
     @DisplayName("Deve retornar o status 201 created quando cadastrar um orçamento com sucesso")
     void cadastrarOrcamentos() {
-        when(service.cadastrarOrcamentos(any(DadosCadastroOrcamento.class))).thenReturn(orcamento);
+        when(service.cadastrarOrcamentos(any(DadosCadastroOrcamentoAdmin.class))).thenReturn(orcamento);
 
-        ResponseEntity<Orcamento> response = controller.cadastrarOrcamentos(dados);
+        ResponseEntity<DadosCadastroOrcamentoAdmin> response = controller.cadastrarOrcamentos(dados);
 
         assertAll("validação dos campos do orçamento retornado",
-                () -> assertEquals(1L, response.getBody().getId()),
-                () -> assertEquals("energia", response.getBody().getNome()),
-                () -> assertEquals(BigDecimal.valueOf(200), response.getBody().getValor()),
-                () -> assertEquals(Categoria.DEBITO, response.getBody().getCategoria()),
-                () -> assertEquals(Status.PENDENTE, response.getBody().getStatus()));
+                () -> assertEquals(1L, response.getBody().usuarioId()),
+                () -> assertEquals("energia", response.getBody().nome()),
+                () -> assertEquals(BigDecimal.valueOf(200), response.getBody().valor()),
+                () -> assertEquals(Categoria.DEBITO, response.getBody().categoria()),
+                () -> assertEquals(Status.PENDENTE, response.getBody().status()),
+                () -> assertEquals(HttpStatus.CREATED, response.getStatusCode()));
     }
 
 
@@ -106,7 +104,7 @@ class OrcamentoControllerTest {
     void listarOrcamentosPorUsuario(){
                 when(service.listarOrcamentosPorUsuario(any(Authentication.class),any(Pageable.class))).thenReturn(page);
 
-        ResponseEntity <Page<DadosCadastroOrcamento>> response = controller.listarOrcamentoPorUsuario(authentication,Pageable.unpaged());
+        ResponseEntity <Page<DadosCadastroOrcamentoAdmin>> response = controller.listarOrcamentoPorUsuario(authentication,Pageable.unpaged());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(page.getTotalElements(), response.getBody().getContent().size());
@@ -118,7 +116,7 @@ class OrcamentoControllerTest {
     void listarOrcamento() {
         when(service.listarOrcamentos(any(Pageable.class))).thenReturn(page);
 
-        ResponseEntity<Page<DadosCadastroOrcamento>> response = controller.listarOrcamentos(Pageable.unpaged());
+        ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> response = controller.listarOrcamentos(Pageable.unpaged());
 
         assertEquals(HttpStatus.OK,response.getStatusCode());
         assertNotNull(response.getBody());
@@ -127,11 +125,11 @@ class OrcamentoControllerTest {
 
 
     @Test
-    @DisplayName("Deve retornar a lista de orçamentos paginados com sucesso!")
+    @DisplayName("Deve retornar orçamento escolhido pelo id!")
     void BuscarOrcamentoPorId() {
         when(service.buscarOrcamentoPorId(anyLong())).thenReturn(dados);
 
-        ResponseEntity<DadosCadastroOrcamento> response = controller.buscarOrcamentoPorId(1L);
+        ResponseEntity<DadosCadastroOrcamentoAdmin> response = controller.buscarOrcamentoPorId(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -143,7 +141,7 @@ class OrcamentoControllerTest {
     void buscarOrcamentoPorNome(){
         when(service.buscarOrcamentoPorNome(anyString(),any(Pageable.class))).thenReturn(page);
 
-        ResponseEntity<Page<DadosCadastroOrcamento>> response = controller.buscarOrcamentoPorNome("energia",Pageable.unpaged());
+        ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> response = controller.buscarOrcamentoPorNome("energia",Pageable.unpaged());
 
         assertEquals(HttpStatus.OK,response.getStatusCode());
         assertNotNull(response.getBody());
@@ -156,7 +154,7 @@ class OrcamentoControllerTest {
     void buscarOrcamentoPorNomePorUsuario(){
         when(service.buscarOrcamentoPorNomePorUsuario(any(Authentication.class),anyString(),any(Pageable.class))).thenReturn(page);
 
-        ResponseEntity<Page<DadosCadastroOrcamento>> response =
+        ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> response =
                 controller.buscarOrcamentoPorUsuarioPorNome(authentication,"energia",Pageable.unpaged());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -170,7 +168,7 @@ class OrcamentoControllerTest {
     void atualizarOrcamento() {
         when(service.atualizarOrcamento(any(DadosAtulizarOrcamento.class))).thenReturn(retorno);
 
-        ResponseEntity<DadosCadastroOrcamento> response = controller.atualizarOrcamento(dadosAtualizados);
+        ResponseEntity<DadosCadastroOrcamentoAdmin> response = controller.atualizarOrcamento(dadosAtualizados);
 
         assertAll("Validação dos campos atualizados",
                 () ->assertNotNull(response.getBody()),
@@ -185,7 +183,7 @@ class OrcamentoControllerTest {
     void atualizarOrcamentoPorUsuario(){
         when(service.atulizarOrcamentoPorUsuario(any(Authentication.class),any(DadosAtulizarOrcamento.class))).thenReturn(retorno);
 
-        ResponseEntity<DadosCadastroOrcamento> response = controller.atualizarOrcamentoPorUsuario(authentication,dadosAtualizados);
+        ResponseEntity<DadosCadastroOrcamentoAdmin> response = controller.atualizarOrcamentoPorUsuario(authentication,dadosAtualizados);
 
         assertAll("Validação dos campos atualizados",
                 () ->assertNotNull(response.getBody()),

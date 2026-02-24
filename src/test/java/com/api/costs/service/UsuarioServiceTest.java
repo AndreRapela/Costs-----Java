@@ -1,149 +1,233 @@
-package com.api.costs.service;
+package com.api.costs.controllers;
 
-import com.api.costs.repository.UsuarioRepository;
-import com.api.costs.usuario.DTOs.DadosAtualizarUsuario;
-import com.api.costs.usuario.DTOs.DadosCadastroUsuario;
-import com.api.costs.usuario.DTOs.DadosListarUsuario;
-import com.api.costs.usuario.Usuario;
+import com.api.costs.orcamento.Categoria;
+import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
+import com.api.costs.orcamento.DTO.DadosCadastroOrcamentoAdmin;
+import com.api.costs.orcamento.Orcamento;
+import com.api.costs.orcamento.Status;
+import com.api.costs.service.OrcamentoService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
-class UsuarioServiceTest {
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-    @Mock
-    private Authentication authentication;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-    @Mock
-    private UsuarioRepository repository;
+@WebMvcTest(OrcamentoController.class)
+class OrcamentoControllerTest {
 
-    @InjectMocks
-    private UsuarioService service;
+    @Autowired
+    private MockMvc mockMvc;
 
-    private Usuario usuario;
-    private Page<Usuario> page;
-    private DadosCadastroUsuario dadosCadastro;
-    private DadosAtualizarUsuario dadosAtualizar;
+    @MockBean
+    private OrcamentoService service;
 
-        @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setLogin("usuarioTeste");
-        usuario.setSenha("senhaTeste");
-        dadosCadastro = new DadosCadastroUsuario(usuario);
-        dadosAtualizar = new DadosAtualizarUsuario(1L,"senhaAtualizada");
-        page = new PageImpl<>(List.of(usuario));
+    private DadosCadastroOrcamentoAdmin dados;
+    private Orcamento orcamento;
+    private Page<DadosCadastroOrcamentoAdmin> page;
+    private DadosAtulizarOrcamento dadosAtualizados;
+    private DadosCadastroOrcamentoAdmin retorno;
 
+    @BeforeEach
+    void setup() {
+        dados = new DadosCadastroOrcamentoAdmin(
+                "energia",
+                BigDecimal.valueOf(200),
+                Categoria.DEBITO,
+                Status.PENDENTE,
+                1L
+        );
+
+        orcamento = new Orcamento(dados);
+        orcamento.setId(1L);
+
+        page = new PageImpl<>(List.of(dados));
+
+        dadosAtualizados = new DadosAtulizarOrcamento(
+                1L,
+                "água",
+                BigDecimal.valueOf(300),
+                Status.ABATIDO
+        );
+
+        retorno = new DadosCadastroOrcamentoAdmin(
+                "água",
+                BigDecimal.valueOf(300),
+                Categoria.DEBITO,
+                Status.ABATIDO,
+                1L
+        );
     }
 
+    // 1 - POST /costs (usuário)
     @Test
-    void getUsuarioLogado() {
-        when(authentication.getName()).thenReturn("usuarioTeste");
-        when(repository.findByLogin(anyString())).thenReturn(usuario);
+    void cadastrarOrcamentoPorUsuario() throws Exception {
+        Authentication auth = mock(Authentication.class);
 
-        Usuario resultado = service.getUsuarioLogado(authentication);
+        when(service.cadastrarOrcamentosPorUsuario(eq(dados), same(auth)))
+                .thenReturn(orcamento);
 
-        assertEquals(usuario.getId(),resultado.getId());
-        verify(repository,times(1)).findByLogin(anyString());
+        mockMvc.perform(post("/costs")
+                        .principal(auth)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dados)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nome").value("energia"))
+                .andExpect(jsonPath("$.usuarioId").value(1L));
     }
 
+    // 2 - POST /costs/admin
     @Test
-    void cadastrarUsuario() {
-         when(repository.save(any(Usuario.class))).thenReturn(usuario);
+    void cadastrarOrcamentoAdmin() throws Exception {
+        when(service.cadastrarOrcamentos(eq(dados)))
+                .thenReturn(orcamento);
 
-         Usuario resultado = service.cadastrarUsuario(dadosCadastro);
-
-         assertNotNull(resultado);
-         verify(repository,times(1)).save(any(Usuario.class));
+        mockMvc.perform(post("/costs/admin")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dados)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nome").value("energia"));
     }
 
+    // 3 - GET /costs (usuário)
     @Test
-    void listarUsuarios() {
-        when(repository.findAll(any(Pageable.class))).thenReturn(page);
+    void listarPorUsuario() throws Exception {
+        Authentication auth = mock(Authentication.class);
 
-        Page<DadosListarUsuario> resultado = service.listarUsuarios(Pageable.unpaged());
+        when(service.listarOrcamentosPorUsuario(same(auth), any(Pageable.class)))
+                .thenReturn(page);
 
-        assertEquals(page.getTotalElements(),resultado.getTotalElements());
-        verify(repository,times(1)).findAll(any(Pageable.class));
+        mockMvc.perform(get("/costs")
+                        .principal(auth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1));
     }
 
+    // 4 - GET /costs/admin
     @Test
-    void buscarUsuarioPorLogin() {
-         when(repository.findByLogin(anyString())).thenReturn(usuario);
+    void listarAdmin() throws Exception {
+        when(service.listarOrcamentos(any(Pageable.class)))
+                .thenReturn(page);
 
-         DadosListarUsuario resultado = service.buscarUsuarioPorLogin("usuarioTeste");
-
-         assertNotNull(resultado);
-         verify(repository,times(1)).findByLogin(anyString());
+        mockMvc.perform(get("/costs/admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1));
     }
 
+    // 5 - GET /costs/admin/{id}
     @Test
-    void buscarPorId() {
-         when(repository.getReferenceById(anyLong())).thenReturn(usuario);
+    void buscarPorIdAdmin() throws Exception {
+        when(service.buscarOrcamentoPorId(eq(1L)))
+                .thenReturn(dados);
 
-         DadosListarUsuario resultado = service.buscarPorId(1L);
-
-         assertNotNull(resultado);
-         verify(repository,times(1)).getReferenceById(anyLong());
+        mockMvc.perform(get("/costs/admin/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("energia"));
     }
 
+    // 6 - GET /costs/find?nome=energia (usuário)
     @Test
-    void atualizarSenha() {
-         when(repository.getReferenceById(anyLong())).thenReturn(usuario);
+    void buscarPorNomeUsuario() throws Exception {
+        Authentication auth = mock(Authentication.class);
 
-         DadosCadastroUsuario resultado = service.atualizarSenha(dadosAtualizar);
+        when(service.buscarOrcamentoPorNomePorUsuario(
+                same(auth), eq("energia"), any(Pageable.class)))
+                .thenReturn(page);
 
-         assertNotNull(resultado);
-         verify(repository,times(1)).getReferenceById(anyLong());
+        mockMvc.perform(get("/costs/find")
+                        .param("nome", "energia")
+                        .principal(auth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].nome").value("energia"));
     }
 
+    // 7 - GET /costs/admin/find?nome=energia
     @Test
-    void atualizarSenhaDoUsuario() {
-         when(authentication.getName()).thenReturn("usuarioTeste");
-         when(repository.findByLogin(anyString())).thenReturn(usuario);
-         when(repository.save(any(Usuario.class))).thenReturn(usuario);
+    void buscarPorNomeAdmin() throws Exception {
+        when(service.buscarOrcamentoPorNome(eq("energia"), any(Pageable.class)))
+                .thenReturn(page);
 
-         DadosCadastroUsuario resultado = service.atualizarSenhaDoUsuario(authentication,dadosAtualizar);
-
-         assertNotNull(resultado);
-         verify(repository,times(1)).findByLogin(anyString());
-         verify(repository,times(1)).save(any(Usuario.class));
+        mockMvc.perform(get("/costs/admin/find")
+                        .param("nome", "energia"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1));
     }
 
+    // 8 - PUT /costs/admin
     @Test
-    void excluirUsuario() {
-         doNothing().when(repository).deleteById(anyLong());
+    void atualizarAdmin() throws Exception {
+        when(service.atualizarOrcamento(eq(dadosAtualizados)))
+                .thenReturn(retorno);
 
-         service.excluirUsuario(1L);
-
-         verify(repository,times(1)).deleteById(anyLong());
+        mockMvc.perform(put("/costs/admin")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dadosAtualizados)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("água"));
     }
 
+    // 9 - PUT /costs (usuário)
     @Test
-    void excluirUsuarioSelf() {
-         when(authentication.getName()).thenReturn("usuarioTeste");
-         when(repository.findByLogin("usuarioTeste")).thenReturn(usuario);
-         doNothing().when(repository).delete(any(Usuario.class));
+    void atualizarUsuario() throws Exception {
+        Authentication auth = mock(Authentication.class);
 
-         service.excluirUsuarioSelf(authentication);
+        when(service.atulizarOrcamentoPorUsuario(same(auth), eq(dadosAtualizados)))
+                .thenReturn(retorno);
 
-         verify(repository,times(1)).delete(any(Usuario.class));
-         verify(repository,times(1)).findByLogin(anyString());
+        mockMvc.perform(put("/costs")
+                        .principal(auth)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dadosAtualizados)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ABATIDO"));
+    }
+
+    // 10 - DELETE /costs/admin/{id}
+    @Test
+    void deletarAdmin() throws Exception {
+        doNothing().when(service).excluirOrcamento(eq(1L));
+
+        mockMvc.perform(delete("/costs/admin/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    // 11 - DELETE /costs/{id} (usuário)
+    @Test
+    void deletarUsuario() throws Exception {
+        Authentication auth = mock(Authentication.class);
+
+        doNothing().when(service)
+                .excluirOrcamentoPorUsuario(same(auth), eq(1L));
+
+        mockMvc.perform(delete("/costs/1")
+                        .principal(auth))
+                .andExpect(status().isNoContent());
     }
 }

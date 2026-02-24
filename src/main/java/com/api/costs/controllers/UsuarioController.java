@@ -50,7 +50,6 @@ public class UsuarioController {
             description = "Listar todos os usuários ")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Lista encontrada com sucesso!"),
-        @ApiResponse(responseCode = "404", description = "Lista de usuários não encontrada.")
     })
     @GetMapping("/admin")
     public ResponseEntity<Page<DadosListarUsuario>> listarUsuarios (Pageable page){
@@ -62,11 +61,10 @@ public class UsuarioController {
             description = "Lista todos os usuários que contenham o nome passado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200" , description = "lista de usuários encontrada com sucesso!"),
-            @ApiResponse(responseCode = "404", description = "Lista de usuários não encontrada!")
     })
     @GetMapping("/admin/find")
-    public ResponseEntity<DadosListarUsuario> buscarUsuarioPorLogin ( @RequestParam String login){
-        return  ResponseEntity.ok(service.buscarUsuarioPorLogin(login));
+    public ResponseEntity<Page<DadosListarUsuario>> buscarUsuarioPorLogin ( @RequestParam String login,Pageable page){
+        return  ResponseEntity.ok(service.buscarUsuarioPorLogin(login, page));
     }
 
 

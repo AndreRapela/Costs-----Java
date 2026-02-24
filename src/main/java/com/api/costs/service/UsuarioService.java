@@ -43,8 +43,8 @@ public class UsuarioService {
     }
 
 
-    public DadosListarUsuario buscarUsuarioPorLogin( String login){
-        return new DadosListarUsuario(repository.findByLogin(login));
+    public Page<DadosListarUsuario> buscarUsuarioPorLogin(String login, Pageable page){
+        return repository.findByLoginContainingIgnoreCase(login,page).map(DadosListarUsuario::new);
     }
 
 
@@ -70,12 +70,15 @@ public class UsuarioService {
     }
 
 
-    @Transactional
-    public void excluirUsuario(Long id){ repository.deleteById(id); }
+    @Transactional public void excluirUsuario(Long id){
+        Usuario usuario = repository.getReferenceById(id);
+        usuario.setAtivo(false);
+    }
 
 
     @Transactional
     public void excluirUsuarioSelf(Authentication authentication){
-        repository.delete(getUsuarioLogado(authentication));
+        Usuario usuario = getUsuarioLogado(authentication);
+        usuario.setAtivo(false);
     }
 }

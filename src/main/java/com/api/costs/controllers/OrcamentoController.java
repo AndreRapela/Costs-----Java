@@ -2,14 +2,13 @@ package com.api.costs.controllers;
 
 import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
 import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
+import com.api.costs.orcamento.DTO.DadosCadastroOrcamentoAdmin;
 import com.api.costs.orcamento.Orcamento;
-import com.api.costs.repository.OrcamentoRepository;
 import com.api.costs.service.OrcamentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,14 +41,14 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados. Já existente."),
     })
     @PostMapping
-    public ResponseEntity<Orcamento> cadastrarOrcamentosPorUsuario(@RequestBody @Valid DadosCadastroOrcamento dados, Authentication authentication){
+    public ResponseEntity<DadosCadastroOrcamentoAdmin> cadastrarOrcamentosPorUsuario(@RequestBody @Valid DadosCadastroOrcamentoAdmin dados, Authentication authentication){
         Orcamento orcamento = service.cadastrarOrcamentosPorUsuario(dados, authentication);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orcamento.getId()).toUri();
-        return ResponseEntity.created(uri).body(orcamento);
+        return ResponseEntity.created(uri).body(new DadosCadastroOrcamentoAdmin(orcamento));
     }
 
 
-    @Operation(summary = "CADASTRAR USUÁRIO",
+    @Operation(summary = "CADASTRAR ORÇAMENTO",
             description = "Cadastra um orçamento do usuário atual passando: " +
                     "String nome, Double valor, Status status(ENUM), Categoria categoria(ENUM)")
     @ApiResponses(value ={
@@ -59,10 +58,10 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados já existe.")
     })
     @PostMapping("/admin")
-    public ResponseEntity<Orcamento> cadastrarOrcamentos(@RequestBody @Valid DadosCadastroOrcamento dados){
-        Orcamento orcamento =  service.cadastrarOrcamentos(dados);
+    public ResponseEntity<DadosCadastroOrcamentoAdmin> cadastrarOrcamentos(@RequestBody @Valid DadosCadastroOrcamentoAdmin dados){
+        Orcamento  orcamento=  service.cadastrarOrcamentos(dados);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orcamento.getId()).toUri();
-        return  ResponseEntity.created(uri).body(orcamento);
+        return  ResponseEntity.created(uri).body(new DadosCadastroOrcamentoAdmin(orcamento));
     }
 
 
@@ -73,7 +72,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "lista não encontrada.")
     })
     @GetMapping("/admin")
-    public ResponseEntity<Page<DadosCadastroOrcamento>> listarOrcamentos (Pageable page){
+    public ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> listarOrcamentos (Pageable page){
         return ResponseEntity.ok(service.listarOrcamentos(page));
     }
 
@@ -85,7 +84,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Lista não encontrada.")
     })
     @GetMapping
-    public ResponseEntity<Page<DadosCadastroOrcamento>> listarOrcamentoPorUsuario (Authentication authentication, Pageable page){
+    public ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> listarOrcamentoPorUsuario (Authentication authentication, Pageable page){
         return ResponseEntity.ok(service.listarOrcamentosPorUsuario(authentication, page));
     }
 
@@ -97,7 +96,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Orçamento não encontrado.")
     })
     @GetMapping("/admin/{id}")
-    public ResponseEntity<DadosCadastroOrcamento> buscarOrcamentoPorId(@PathVariable Long id){
+    public ResponseEntity<DadosCadastroOrcamentoAdmin> buscarOrcamentoPorId(@PathVariable Long id){
         return ResponseEntity.ok(service.buscarOrcamentoPorId(id));
     }
 
@@ -109,7 +108,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Página não encontrada")
     })
     @GetMapping("/find")
-    public ResponseEntity<Page<DadosCadastroOrcamento>> buscarOrcamentoPorUsuarioPorNome(Authentication authentication,@RequestParam String nome, Pageable page){
+    public ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> buscarOrcamentoPorUsuarioPorNome(Authentication authentication, @RequestParam String nome, Pageable page){
         return ResponseEntity.ok(service.buscarOrcamentoPorNomePorUsuario(authentication,nome,page));
     }
 
@@ -121,7 +120,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Página não encontrada")
     })
    @GetMapping("admin/find")
-    public  ResponseEntity<Page<DadosCadastroOrcamento>> buscarOrcamentoPorNome(@RequestParam String nome, Pageable page){
+    public  ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> buscarOrcamentoPorNome(@RequestParam String nome, Pageable page){
         return ResponseEntity.ok(service.buscarOrcamentoPorNome(nome,page));
     }
 
@@ -142,7 +141,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes."),
     })
     @PutMapping("/admin")
-    public ResponseEntity<DadosCadastroOrcamento> atualizarOrcamento (@RequestBody @Valid DadosAtulizarOrcamento dados) {
+    public ResponseEntity<DadosCadastroOrcamentoAdmin> atualizarOrcamento (@RequestBody @Valid DadosAtulizarOrcamento dados) {
         return ResponseEntity.ok(service.atualizarOrcamento(dados));
     }
 
@@ -155,17 +154,9 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes."),
     })
     @PutMapping
-    public ResponseEntity<DadosCadastroOrcamento> atualizarOrcamentoPorUsuario(Authentication authentication ,@RequestBody @Valid DadosAtulizarOrcamento dados){
+    public ResponseEntity<DadosCadastroOrcamentoAdmin> atualizarOrcamentoPorUsuario(Authentication authentication , @RequestBody @Valid DadosAtulizarOrcamento dados){
         return ResponseEntity.ok(service.atulizarOrcamentoPorUsuario(authentication,dados));
     }
-
-
-//    @PutMapping("debitado/{id}")
-//    @Transactional
-//    public void registrar (@PathVariable long id){
-//        var orcamento = repository.getReferenceById(id);
-//        orcamento.registar();
-//    }
 
 
     @Operation(summary = "EXCLUSÃO DE ORÇAMENTO",
@@ -190,14 +181,6 @@ public class OrcamentoController {
         service.excluirOrcamentoPorUsuario(authentication, id);
         return ResponseEntity.noContent().build();
     }
-
-
-//    @DeleteMapping("debitado/{id}")
-//    @Transactional
-//    public void debitar (@PathVariable long id){
-//        var orcamento = repository.getReferenceById(id);
-//        orcamento.debitar();
-//    }
 
 
 

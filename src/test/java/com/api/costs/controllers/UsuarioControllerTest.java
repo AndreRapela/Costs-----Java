@@ -89,14 +89,14 @@ class UsuarioControllerTest {
 
     @Test
     void buscarUsuarioPorLogin() {
-        when(service.buscarUsuarioPorLogin(anyString())).thenReturn(dados);
+        when(service.buscarUsuarioPorLogin(anyString(),any(Pageable.class))).thenReturn(page);
 
-        ResponseEntity<DadosListarUsuario> response = controller.buscarUsuarioPorLogin("usuarioTeste");
+        ResponseEntity<Page<DadosListarUsuario>> response = controller.buscarUsuarioPorLogin("usuarioTeste",Pageable.unpaged());
 
         assertAll("validação dos campos do usuário retornado",
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertNotNull(response.getBody()),
-                () -> assertEquals("usuarioTeste", response.getBody().login()));
+                () -> assertEquals("usuarioTeste", response.getBody().getContent().get(0).login()));
     }
 
     @Test

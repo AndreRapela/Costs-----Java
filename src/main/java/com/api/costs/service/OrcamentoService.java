@@ -2,6 +2,7 @@ package com.api.costs.service;
 
 import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
 import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
+import com.api.costs.orcamento.DTO.DadosCadastroOrcamentoAdmin;
 import com.api.costs.orcamento.Orcamento;
 import com.api.costs.repository.OrcamentoRepository;
 import com.api.costs.repository.UsuarioRepository;
@@ -29,7 +30,7 @@ public class OrcamentoService {
 
 
     @Transactional
-    public Orcamento cadastrarOrcamentosPorUsuario (DadosCadastroOrcamento dados, Authentication authentication){
+    public Orcamento cadastrarOrcamentosPorUsuario (DadosCadastroOrcamentoAdmin dados, Authentication authentication){
 
         Orcamento orcamento = new Orcamento(dados);
         orcamento.setUsuario(usuarioService.getUsuarioLogado(authentication));
@@ -39,58 +40,61 @@ public class OrcamentoService {
 
 
     @Transactional
-    public Orcamento cadastrarOrcamentos (DadosCadastroOrcamento dados){
+    public Orcamento cadastrarOrcamentos (DadosCadastroOrcamentoAdmin dados){
         Orcamento orcamento = new Orcamento(dados);
         orcamento.setUsuario(usuarioRepository.getReferenceById(dados.usuarioId()));
         return repository.save(orcamento);
     }
 
 
-    public Page<DadosCadastroOrcamento> listarOrcamentosPorUsuario(Authentication authentication, Pageable pageable){
-        return repository.findByUsuario(usuarioService.getUsuarioLogado(authentication),pageable).map(DadosCadastroOrcamento::new);
+    public Page<DadosCadastroOrcamentoAdmin> listarOrcamentosPorUsuario(Authentication authentication, Pageable pageable){
+        return repository.findByUsuario(usuarioService.getUsuarioLogado(authentication),pageable).map(DadosCadastroOrcamentoAdmin::new);
     }
 
 
-    public Page<DadosCadastroOrcamento> listarOrcamentos(Pageable page){
-        return repository.findAll(page).map(DadosCadastroOrcamento::new);
+    public Page<DadosCadastroOrcamentoAdmin> listarOrcamentos(Pageable page){
+        return repository.findAll(page).map(DadosCadastroOrcamentoAdmin::new);
     }
 
 
-    public DadosCadastroOrcamento buscarOrcamentoPorId(Long id){
-        return new DadosCadastroOrcamento(repository.getReferenceById(id));
+    public DadosCadastroOrcamentoAdmin buscarOrcamentoPorId(Long id){
+        Orcamento orcamento = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Orçamento não encontrado"));
+        return new DadosCadastroOrcamentoAdmin(orcamento);
     }
 
 
-    public Page<DadosCadastroOrcamento> buscarOrcamentoPorNomePorUsuario(Authentication authentication, String nome, Pageable page ){
-        return repository.findByUsuarioAndNomeContaining(usuarioService.getUsuarioLogado(authentication),nome,page).map(DadosCadastroOrcamento::new);
+    public Page<DadosCadastroOrcamentoAdmin> buscarOrcamentoPorNomePorUsuario(Authentication authentication, String nome, Pageable page ){
+        return repository.findByUsuarioAndNomeContaining(usuarioService.getUsuarioLogado(authentication),nome,page).map(DadosCadastroOrcamentoAdmin::new);
     }
 
 
-    public Page<DadosCadastroOrcamento> buscarOrcamentoPorNome(String nome, Pageable page){
-        return repository.findByNome(nome,page).map(DadosCadastroOrcamento::new);
+    public Page<DadosCadastroOrcamentoAdmin> buscarOrcamentoPorNome(String nome, Pageable page){
+        return repository.findByNomeContainingIgnoreCase(nome,page).map(DadosCadastroOrcamentoAdmin::new);
     }
 
 
     @Transactional
-    public DadosCadastroOrcamento atualizarOrcamento(DadosAtulizarOrcamento dados){
+    public DadosCadastroOrcamentoAdmin atualizarOrcamento(DadosAtulizarOrcamento dados){
         Orcamento orcamento = repository.getReferenceById(dados.id());
         orcamento.atualizarInformacoes(dados);
-        return new DadosCadastroOrcamento(orcamento);
+        return new DadosCadastroOrcamentoAdmin(orcamento);
     }
 
 
     @Transactional
-    public DadosCadastroOrcamento atulizarOrcamentoPorUsuario(Authentication authentication, DadosAtulizarOrcamento dados){
+    public DadosCadastroOrcamentoAdmin atulizarOrcamentoPorUsuario(Authentication authentication, DadosAtulizarOrcamento dados){
         Orcamento orcamento = repository.findByUsuarioAndId(usuarioService.getUsuarioLogado(authentication),dados.id())
                 .orElseThrow(EntityNotFoundException::new);
         orcamento.atualizarInformacoes(dados);
-        return new DadosCadastroOrcamento(orcamento);
+        return new DadosCadastroOrcamentoAdmin(orcamento);
     }
 
 
     @Transactional
     public void excluirOrcamento(Long id){
-        repository.deleteById(id);
+        var orcamento = repository.getReferenceById(id);
+
+        orcamento.setAtivo(false);
     }
 
 
@@ -100,7 +104,7 @@ public class OrcamentoService {
 
         Orcamento orcamento = repository.findByUsuarioAndId(usuario,id).orElseThrow(EntityNotFoundException::new);
 
-        repository.delete(orcamento);
+        orcamento.setAtivo(false);
     }
 
 }
