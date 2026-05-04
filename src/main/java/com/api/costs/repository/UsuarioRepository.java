@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
 
-    Usuario findByLogin( String nome);
+    Usuario findByLogin( String login);
 
     Page<Usuario> findByLoginContainingIgnoreCase(  String nome,Pageable page);
 

@@ -2,25 +2,33 @@ package com.api.costs.controllers;
 
 
 
+import com.api.costs.infra.SecurityFilter;
 import com.api.costs.service.UsuarioService;
 import com.api.costs.usuario.DTOs.DadosAtualizarUsuario;
 import com.api.costs.usuario.DTOs.DadosCadastroUsuario;
 import com.api.costs.usuario.DTOs.DadosListarUsuario;
 import com.api.costs.usuario.Usuario;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
+
 import org.springframework.security.core.Authentication;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.test.web.servlet.MockMvc;
+
 
 import java.util.List;
 
@@ -29,37 +37,37 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-
+@WebMvcTest(controllers = UsuarioController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UsuarioControllerTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
     private UsuarioService service;
 
-    @Mock
-    private Authentication authentication;
+    @MockBean
+    private SecurityFilter securityFilter;
 
-    @InjectMocks
-    UsuarioController controller;
+    @MockBean
+    private JpaMetamodelMappingContext jpaMappingContext;
 
     private DadosCadastroUsuario dadosCadastro;
     private DadosAtualizarUsuario dadosAtualizar;
-    private DadosCadastroUsuario retornoDadosAtualizado;
     private Usuario usuario;
     private DadosListarUsuario dados;
     private Page<DadosListarUsuario> page;
 
     @BeforeEach
     void CriarDTO() {
-        MockitoAnnotations.openMocks(this);
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-
         dadosCadastro = new DadosCadastroUsuario("usuarioTeste","senhaTeste");
         usuario = new Usuario(dadosCadastro);
         usuario.setId(1L);
         dadosAtualizar = new DadosAtualizarUsuario(1L,"senhaAtualizada");
-        retornoDadosAtualizado = new DadosCadastroUsuario("usuarioTeste", "senhaAtualizada");
-        dados =  new DadosListarUsuario(usuario);
         page = new PageImpl<>(List.of(dados));
     }
 

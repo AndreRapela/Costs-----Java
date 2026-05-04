@@ -1,8 +1,6 @@
 package com.api.costs.controllers;
 
-import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
-import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
-import com.api.costs.orcamento.DTO.DadosCadastroOrcamentoAdmin;
+import com.api.costs.orcamento.DTO.*;
 import com.api.costs.orcamento.Orcamento;
 import com.api.costs.service.OrcamentoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,10 +39,10 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados. Já existente."),
     })
     @PostMapping
-    public ResponseEntity<DadosCadastroOrcamentoAdmin> cadastrarOrcamentosPorUsuario(@RequestBody @Valid DadosCadastroOrcamentoAdmin dados, Authentication authentication){
+    public ResponseEntity<DadosListarOrcamento> cadastrarOrcamentosPorUsuario(@RequestBody @Valid DadosCadastroOrcamento dados, Authentication authentication){
         Orcamento orcamento = service.cadastrarOrcamentosPorUsuario(dados, authentication);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orcamento.getId()).toUri();
-        return ResponseEntity.created(uri).body(new DadosCadastroOrcamentoAdmin(orcamento));
+        return ResponseEntity.created(uri).body(new DadosListarOrcamento(orcamento));
     }
 
 
@@ -58,10 +56,10 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "409", description = "Conflito: orçamento com dados duplicados já existe.")
     })
     @PostMapping("/admin")
-    public ResponseEntity<DadosCadastroOrcamentoAdmin> cadastrarOrcamentos(@RequestBody @Valid DadosCadastroOrcamentoAdmin dados){
-        Orcamento  orcamento=  service.cadastrarOrcamentos(dados);
+    public ResponseEntity<DadosListarOrcamentoAdmin> cadastrarOrcamentos(@RequestBody @Valid DadosCadastroOrcamentoAdmin dados){
+        Orcamento  orcamento= service.cadastrarOrcamentos(dados);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orcamento.getId()).toUri();
-        return  ResponseEntity.created(uri).body(new DadosCadastroOrcamentoAdmin(orcamento));
+        return  ResponseEntity.created(uri).body(new DadosListarOrcamentoAdmin(orcamento));
     }
 
 
@@ -72,7 +70,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "lista não encontrada.")
     })
     @GetMapping("/admin")
-    public ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> listarOrcamentos (Pageable page){
+    public ResponseEntity<Page<DadosListarOrcamentoAdmin>> listarOrcamentos (Pageable page){
         return ResponseEntity.ok(service.listarOrcamentos(page));
     }
 
@@ -84,7 +82,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Lista não encontrada.")
     })
     @GetMapping
-    public ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> listarOrcamentoPorUsuario (Authentication authentication, Pageable page){
+    public ResponseEntity<Page<DadosListarOrcamento>> listarOrcamentoPorUsuario (Authentication authentication, Pageable page){
         return ResponseEntity.ok(service.listarOrcamentosPorUsuario(authentication, page));
     }
 
@@ -96,7 +94,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Orçamento não encontrado.")
     })
     @GetMapping("/admin/{id}")
-    public ResponseEntity<DadosCadastroOrcamentoAdmin> buscarOrcamentoPorId(@PathVariable Long id){
+    public ResponseEntity<DadosListarOrcamentoAdmin> buscarOrcamentoPorId(@PathVariable Long id){
         return ResponseEntity.ok(service.buscarOrcamentoPorId(id));
     }
 
@@ -108,7 +106,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Página não encontrada")
     })
     @GetMapping("/find")
-    public ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> buscarOrcamentoPorUsuarioPorNome(Authentication authentication, @RequestParam String nome, Pageable page){
+    public ResponseEntity<Page<DadosListarOrcamento>> buscarOrcamentoPorUsuarioPorNome(Authentication authentication, @RequestParam String nome, Pageable page){
         return ResponseEntity.ok(service.buscarOrcamentoPorNomePorUsuario(authentication,nome,page));
     }
 
@@ -120,7 +118,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "404", description = "Página não encontrada")
     })
    @GetMapping("admin/find")
-    public  ResponseEntity<Page<DadosCadastroOrcamentoAdmin>> buscarOrcamentoPorNome(@RequestParam String nome, Pageable page){
+    public  ResponseEntity<Page<DadosListarOrcamentoAdmin>> buscarOrcamentoPorNome(@RequestParam String nome, Pageable page){
         return ResponseEntity.ok(service.buscarOrcamentoPorNome(nome,page));
     }
 
@@ -141,7 +139,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes."),
     })
     @PutMapping("/admin")
-    public ResponseEntity<DadosCadastroOrcamentoAdmin> atualizarOrcamento (@RequestBody @Valid DadosAtulizarOrcamento dados) {
+    public ResponseEntity<DadosListarOrcamentoAdmin> atualizarOrcamento (@RequestBody @Valid DadosAtulizarOrcamento dados) {
         return ResponseEntity.ok(service.atualizarOrcamento(dados));
     }
 
@@ -154,7 +152,7 @@ public class OrcamentoController {
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes."),
     })
     @PutMapping
-    public ResponseEntity<DadosCadastroOrcamentoAdmin> atualizarOrcamentoPorUsuario(Authentication authentication , @RequestBody @Valid DadosAtulizarOrcamento dados){
+    public ResponseEntity<DadosListarOrcamento> atualizarOrcamentoPorUsuario(Authentication authentication , @RequestBody @Valid DadosAtulizarOrcamento dados){
         return ResponseEntity.ok(service.atulizarOrcamentoPorUsuario(authentication,dados));
     }
 
@@ -181,7 +179,6 @@ public class OrcamentoController {
         service.excluirOrcamentoPorUsuario(authentication, id);
         return ResponseEntity.noContent().build();
     }
-
 
 
 }

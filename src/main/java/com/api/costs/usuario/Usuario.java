@@ -1,5 +1,6 @@
 package com.api.costs.usuario;
 
+import com.api.costs.cliente.Cliente;
 import com.api.costs.infra.Role;
 import com.api.costs.orcamento.Orcamento;
 import com.api.costs.usuario.DTOs.DadosAtualizarUsuario;
@@ -43,7 +44,7 @@ public class Usuario implements UserDetails {
     @Size(min = 8, max = 50)
     private String login;
 
-    // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank
     @Size(min = 8, max = 20)
     private String senha;
@@ -52,7 +53,11 @@ public class Usuario implements UserDetails {
     @JsonIgnore
     private List<Orcamento> orcamentos = new ArrayList<>();
 
-    @Enumerated
+    @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
+    private List<Cliente> clientes = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
     private boolean ativo = true;

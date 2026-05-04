@@ -40,6 +40,7 @@ public class Orcamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private boolean ativo = true;
     private String nome;
     private BigDecimal valor;
 
@@ -53,13 +54,11 @@ public class Orcamento {
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
-    private boolean ativo = true;
-
     @Column(name = "data_alteracao")
     @LastModifiedDate
     private LocalDateTime dataAlteracao;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, updatable = false)
     @JsonIgnore
     private Usuario usuario;

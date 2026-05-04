@@ -18,6 +18,7 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+
     public String gerarToken(Usuario usuario){
         try {
             var algorithm = Algorithm.HMAC256(secret);
@@ -30,6 +31,8 @@ public class TokenService {
             throw new RuntimeException("Erro ao gerar token", exception);
         }
     }
+
+
 
     public String getSubject(String tokenJWT){
         try {

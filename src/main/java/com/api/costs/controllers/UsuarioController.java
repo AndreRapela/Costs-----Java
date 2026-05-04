@@ -37,11 +37,9 @@ public class UsuarioController {
             @ApiResponse(responseCode = "422", description = "Dados válidos em sintaxe, mas inconsistentes (ex: status inexistente, valor negativo)"),
             @ApiResponse(responseCode = "409",description = "Conflito: Esse usuário já existe")
     })
-    @Transactional
     @PostMapping
     public ResponseEntity<Usuario> cadastrarUsuario (@RequestBody @Valid DadosCadastroUsuario dados){
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{login}").buildAndExpand(dados.login()).toUri();
-
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dados.login()).toUri();
         return ResponseEntity.created(uri).body(service.cadastrarUsuario(dados));
     }
 
