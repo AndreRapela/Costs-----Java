@@ -1,19 +1,16 @@
 package com.api.costs.usuario;
 
-import com.api.costs.cliente.Cliente;
+import com.api.costs.parceiro.Parceiro;
 import com.api.costs.infra.Role;
 import com.api.costs.orcamento.Orcamento;
 import com.api.costs.usuario.DTOs.DadosAtualizarUsuario;
 import com.api.costs.usuario.DTOs.DadosCadastroUsuario;
-import com.api.costs.usuario.DTOs.DadosListarUsuario;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.apache.tomcat.util.digester.Rule;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -55,7 +52,7 @@ public class Usuario implements UserDetails {
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore
-    private List<Cliente> clientes = new ArrayList<>();
+    private List<Parceiro> parceiros = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;

@@ -38,9 +38,10 @@ public class UsuarioController {
             @ApiResponse(responseCode = "409",description = "Conflito: Esse usuário já existe")
     })
     @PostMapping
-    public ResponseEntity<Usuario> cadastrarUsuario (@RequestBody @Valid DadosCadastroUsuario dados){
+    public ResponseEntity<DadosListarUsuario> cadastrarUsuario (@RequestBody @Valid DadosCadastroUsuario dados){
+        Usuario usuario = service.cadastrarUsuario(dados);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dados.login()).toUri();
-        return ResponseEntity.created(uri).body(service.cadastrarUsuario(dados));
+        return ResponseEntity.created(uri).body(new DadosListarUsuario(usuario));
     }
 
 

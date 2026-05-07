@@ -47,7 +47,7 @@ public class OrcamentoController {
 
 
     @Operation(summary = "CADASTRAR ORÇAMENTO",
-            description = "Cadastra um orçamento do usuário atual passando: " +
+            description = "Cadastra um orçamento : " +
                     "String nome, Double valor, Status status(ENUM), Categoria categoria(ENUM)")
     @ApiResponses(value ={
             @ApiResponse(responseCode = "201", description = "Orçamento cadastrado com sucesso."),
@@ -123,14 +123,8 @@ public class OrcamentoController {
     }
 
 
-//    @GetMapping("/debitado")
-//    public List<DadosCadastroOrcamento> listarOrcamentosNaoDebitados () {
-//        return  repository.findAllByDebitadoTrue().stream().map(DadosCadastroOrcamento::new).toList();
-//    }
-
-
     @Operation(summary = "EDIÇÃO DE ORÇAMENTO",
-            description = "Altera um orçamento existente passando o id Long. " +
+            description = "Altera um orçamento existente . " +
             "Apenas é possível alterar o String nome, Double valor e o Status status")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200" ,description = "Orçamento atualizado com sucesso"),

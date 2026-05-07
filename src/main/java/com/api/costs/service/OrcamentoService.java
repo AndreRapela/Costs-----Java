@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-@CacheConfig(cacheNames ="orcamentos")
+@CacheConfig(cacheNames ="orcamento")
 public class OrcamentoService {
 
     @Autowired
@@ -66,7 +66,7 @@ public class OrcamentoService {
 
     @Cacheable(key = "'byUserAndByName:' + authentication.name + ':' + #nome + #page.pageNumber + ':' + #page.pageSize + ':' + #page.sorte.toString()")
     public Page<DadosListarOrcamento> buscarOrcamentoPorNomePorUsuario(Authentication authentication, String nome, Pageable page ){
-        return repository.findByUsuarioAndNomeContaining(usuarioService.getUsuarioLogado(authentication),nome,page).map(DadosListarOrcamento::new);
+        return repository.findByUsuarioAndNomeContainingIgnoreCase(usuarioService.getUsuarioLogado(authentication),nome,page).map(DadosListarOrcamento::new);
     }
 
     @Cacheable(key = "'byName:' + #nome +':' + ':' + #page.pageNumber + ':' + #page.pageSize + ':' + #page.sort.toString()")
