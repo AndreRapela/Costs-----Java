@@ -2,7 +2,7 @@ package com.api.costs.usuario;
 
 import com.api.costs.parceiro.Parceiro;
 import com.api.costs.infra.Role;
-import com.api.costs.orcamento.Orcamento;
+import com.api.costs.itemOrcamento.ItemOrcamento;
 import com.api.costs.usuario.DTOs.DadosAtualizarUsuario;
 import com.api.costs.usuario.DTOs.DadosCadastroUsuario;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -48,7 +48,7 @@ public class Usuario implements UserDetails {
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore
-    private List<Orcamento> orcamentos = new ArrayList<>();
+    private List<ItemOrcamento> itemOrcamentos = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore

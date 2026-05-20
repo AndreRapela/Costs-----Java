@@ -13,9 +13,9 @@ public interface ParceiroRepository extends JpaRepository<Parceiro,Long> {
 
     Page<Parceiro> findByUsuario (Usuario usuario, Pageable page);
 
-    Page<Parceiro> fingByNomeContainingIgnoreCase (String nome, Pageable page);
+    Page<Parceiro> findByNomeContainingIgnoreCase (String nome, Pageable page);
 
-    Page<Parceiro> findByNomeAndUsuarioContaingIgnoreCase(String nome, Pageable page, Usuario usuario);
+    Page<Parceiro> findByNomeAndUsuarioContainingIgnoreCase(String nome, Pageable page, Usuario usuario);
 
     Optional<Parceiro> findByUsuarioAndId (Usuario usuario, Long id);
 }

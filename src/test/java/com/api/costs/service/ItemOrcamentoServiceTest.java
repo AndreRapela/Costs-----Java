@@ -1,10 +1,10 @@
 package com.api.costs.service;
 
-import com.api.costs.orcamento.Categoria;
-import com.api.costs.orcamento.DTO.*;
-import com.api.costs.orcamento.Orcamento;
-import com.api.costs.orcamento.Status;
-import com.api.costs.repository.OrcamentoRepository;
+import com.api.costs.itemOrcamento.Categoria;
+import com.api.costs.itemOrcamento.DTO.*;
+import com.api.costs.itemOrcamento.ItemOrcamento;
+import com.api.costs.itemOrcamento.Status;
+import com.api.costs.repository.ItemOrcamentoRepository;
 import com.api.costs.usuario.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +26,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class OrcamentoServiceTest {
+class ItemOrcamentoServiceTest {
 
     @Mock
-    OrcamentoRepository repository;
+    ItemOrcamentoRepository repository;
 
     @Mock
     UsuarioService usuarioService;
@@ -38,15 +38,15 @@ class OrcamentoServiceTest {
     Authentication authentication;
 
     @InjectMocks
-    OrcamentoService service;
+    ItemOrcamentoService service;
 
 
     private Usuario usuario;
-    private Orcamento orcamento;
-    private DadosCadastroOrcamentoAdmin dadosAdmin;
-    private DadosCadastroOrcamento dados;
-    private DadosAtulizarOrcamento dadosAtualizar;
-    private Page<Orcamento> page;
+    private ItemOrcamento itemOrcamento;
+    private DadosCadastroItemOrcamentoAdmin dadosAdmin;
+    private DadosCadastroItemOrcamento dados;
+    private DadosAtulizarItemOrcamento dadosAtualizar;
+    private Page<ItemOrcamento> page;
 
 
 
@@ -55,46 +55,46 @@ class OrcamentoServiceTest {
 
         usuario = new Usuario();
         usuario.setId(1L);
-        dadosAdmin =  new DadosCadastroOrcamentoAdmin("orçamento teste", BigDecimal.valueOf(100), Categoria.CREDITO, Status.EXPIRADO,1L);
-        orcamento = new Orcamento(dadosAdmin);
-        orcamento.setId(10L);
-        orcamento.setUsuario(usuario);
+        dadosAdmin =  new DadosCadastroItemOrcamentoAdmin("orçamento teste", BigDecimal.valueOf(100), Categoria.CREDITO, Status.EXPIRADO,1L);
+        itemOrcamento = new ItemOrcamento(dadosAdmin);
+        itemOrcamento.setId(10L);
+        itemOrcamento.setUsuario(usuario);
 
-        dados = new DadosCadastroOrcamento(orcamento);
+        dados = new DadosCadastroItemOrcamento(itemOrcamento);
 
-        dadosAtualizar = new DadosAtulizarOrcamento
-                (10L,"Orcamento atualizado",BigDecimal.valueOf(200),Status.PENDENTE);
-        page = new PageImpl<>(List.of(orcamento));
+        dadosAtualizar = new DadosAtulizarItemOrcamento
+                (10L,"ItemOrcamento atualizado",BigDecimal.valueOf(200),Status.PENDENTE);
+        page = new PageImpl<>(List.of(itemOrcamento));
 
     }
 
     @Test
     void cadastrarOrcamentosPorUsuario() {
         when(usuarioService.getUsuarioLogado(authentication)).thenReturn(usuario);
-        when(repository.save(any(Orcamento.class))).thenReturn(orcamento);
+        when(repository.save(any(ItemOrcamento.class))).thenReturn(itemOrcamento);
 
-        Orcamento resultado = service.cadastrarOrcamentosPorUsuario(dados,authentication);
+        ItemOrcamento resultado = service.cadastrarItemOrcamentosPorUsuario(dados,authentication);
 
-        assertAll("Validação do orcamento do usuario cadastrado",
+        assertAll("Validação do itemOrcamento do usuario cadastrado",
                 () -> assertNotNull(resultado),
-                () -> assertEquals(orcamento.getId(), resultado.getId()),
+                () -> assertEquals(itemOrcamento.getId(), resultado.getId()),
                 () -> assertEquals(usuario.getId(), resultado.getUsuario().getId()));
 
-        verify(repository, times(1)).save(any(Orcamento.class));
+        verify(repository, times(1)).save(any(ItemOrcamento.class));
         verify(usuarioService,times(1)).getUsuarioLogado(authentication);
     }
 
     @Test
     void cadastrarOrcamentos() {
-        when(repository.save(any(Orcamento.class))).thenReturn(orcamento);
+        when(repository.save(any(ItemOrcamento.class))).thenReturn(itemOrcamento);
 
-        Orcamento resultado = service.cadastrarOrcamentos(dadosAdmin);
+        ItemOrcamento resultado = service.cadastrarItemOrcamentos(dadosAdmin);
 
-        assertAll("Validação do orcamento cadastrado",
-                () -> assertEquals(orcamento.getId(),resultado.getId()),
+        assertAll("Validação do itemOrcamento cadastrado",
+                () -> assertEquals(itemOrcamento.getId(),resultado.getId()),
                 () -> assertNotNull(resultado));
 
-        verify(repository,times(1)).save(any(Orcamento.class));
+        verify(repository,times(1)).save(any(ItemOrcamento.class));
     }
 
     @Test
@@ -102,7 +102,7 @@ class OrcamentoServiceTest {
         when(usuarioService.getUsuarioLogado(authentication)).thenReturn(usuario);
         when(repository.findByUsuario(usuario,Pageable.unpaged())).thenReturn(page);
 
-        Page<DadosListarOrcamento> resultado = service.listarOrcamentosPorUsuario(authentication,Pageable.unpaged());
+        Page<DadosListarItemOrcamento> resultado = service.listarItemOrcamentosPorUsuario(authentication,Pageable.unpaged());
 
         assertEquals(page.getTotalElements(),resultado.getTotalElements());
         verify(repository,times(1)).findByUsuario(usuario,Pageable.unpaged());
@@ -114,7 +114,7 @@ class OrcamentoServiceTest {
     void listarOrcamentos() {
         when(repository.findAll(any(Pageable.class))).thenReturn(page);
 
-        Page<DadosListarOrcamentoAdmin> resultado = service.listarOrcamentos(Pageable.unpaged());
+        Page<DadosListarItemOrcamentoAdmin> resultado = service.listarItemOrcamentos(Pageable.unpaged());
 
         assertEquals(page.getTotalElements(),resultado.getTotalElements());
         verify(repository,times(1)).findAll(Pageable.unpaged());
@@ -122,9 +122,9 @@ class OrcamentoServiceTest {
 
     @Test
     void buscarOrcamentoPorId() {
-        when(repository.findById(10L)).thenReturn(Optional.of(orcamento));
+        when(repository.findById(10L)).thenReturn(Optional.of(itemOrcamento));
 
-        DadosListarOrcamentoAdmin resultado = service.buscarOrcamentoPorId(10L);
+        DadosListarItemOrcamentoAdmin resultado = service.buscarItemOrcamentoPorId(10L);
 
         assertEquals("orçamento teste",resultado.nome());
         verify(repository,times(1)).findById(10L);
@@ -133,21 +133,21 @@ class OrcamentoServiceTest {
     @Test
     void buscarOrcamentoPorNomePorUsuario() {
         when(usuarioService.getUsuarioLogado(authentication)).thenReturn(usuario);
-        when(repository.findByUsuarioAndNomeContaining(any(Usuario.class),anyString(),any(Pageable.class))).thenReturn(page);
+        when(repository.findByUsuarioAndNomeContainingIgnoreCase(any(Usuario.class),anyString(),any(Pageable.class))).thenReturn(page);
 
-        Page<DadosListarOrcamento> resultado = service.buscarOrcamentoPorNomePorUsuario
+        Page<DadosListarItemOrcamento> resultado = service.buscarItemOrcamentoPorNomePorUsuario
                 (authentication,"orçamento teste", Pageable.unpaged());
 
         assertEquals(page.getTotalElements(), resultado.getTotalElements());
         verify(usuarioService,times(1)).getUsuarioLogado(authentication);
-        verify(repository,times(1)).findByUsuarioAndNomeContaining(any(Usuario.class),anyString(),any(Pageable.class));
+        verify(repository,times(1)).findByUsuarioAndNomeContainingIgnoreCase(any(Usuario.class),anyString(),any(Pageable.class));
     }
 
     @Test
     void buscarOrcamentoPorNome() {
         when(repository.findByNomeContainingIgnoreCase(anyString(),any(Pageable.class))).thenReturn(page);
 
-        Page<DadosListarOrcamentoAdmin> resultado = service.buscarOrcamentoPorNome("usuario Teste",Pageable.unpaged());
+        Page<DadosListarItemOrcamentoAdmin> resultado = service.buscarItemOrcamentoPorNome("usuario Teste",Pageable.unpaged());
 
         assertEquals(page.getTotalElements(),resultado.getTotalElements());
         verify(repository,times(1)).findByNomeContainingIgnoreCase(anyString(),any(Pageable.class));
@@ -155,9 +155,9 @@ class OrcamentoServiceTest {
 
     @Test
     void atualizarOrcamento() {
-        when(repository.getReferenceById(anyLong())).thenReturn(orcamento);
+        when(repository.getReferenceById(anyLong())).thenReturn(itemOrcamento);
 
-        DadosListarOrcamentoAdmin resultado = service.atualizarOrcamento(dadosAtualizar);
+        DadosListarItemOrcamentoAdmin resultado = service.atualizarItemOrcamento(dadosAtualizar);
 
         verify(repository,times(1)).getReferenceById(anyLong());
     }
@@ -165,9 +165,9 @@ class OrcamentoServiceTest {
     @Test
     void atulizarOrcamentoPorUsuario() {
         when(usuarioService.getUsuarioLogado(any(Authentication.class))).thenReturn(usuario);
-        when(repository.findByUsuarioAndId(any(Usuario.class),anyLong())).thenReturn(Optional.of(orcamento));
+        when(repository.findByUsuarioAndId(any(Usuario.class),anyLong())).thenReturn(Optional.of(itemOrcamento));
 
-        DadosListarOrcamento resultado = service.atulizarOrcamentoPorUsuario(authentication,dadosAtualizar);
+        DadosListarItemOrcamento resultado = service.atulizarItemOrcamentoPorUsuario(authentication,dadosAtualizar);
 
         verify(usuarioService,times(1)).getUsuarioLogado(any(Authentication.class));
         verify(repository,times(1)).findByUsuarioAndId(any(Usuario.class),anyLong());
@@ -175,22 +175,22 @@ class OrcamentoServiceTest {
 
     @Test
     void excluirOrcamento() {
-        when(repository.getReferenceById(10L)).thenReturn(orcamento);
+        when(repository.getReferenceById(10L)).thenReturn(itemOrcamento);
 
-       service.excluirOrcamento(10L);
+       service.excluirItemOrcamento(10L);
 
-       assertFalse(orcamento.isAtivo());
+       assertFalse(itemOrcamento.isAtivo());
        verify(repository,times(1)).getReferenceById(anyLong());
     }
 
     @Test
     void excluirOrcamentoPorUsuario() {
         when(usuarioService.getUsuarioLogado(any(Authentication.class))).thenReturn(usuario);
-        when(repository.findByUsuarioAndId(any(Usuario.class),anyLong())).thenReturn(Optional.of(orcamento));
+        when(repository.findByUsuarioAndId(any(Usuario.class),anyLong())).thenReturn(Optional.of(itemOrcamento));
 
-        service.excluirOrcamentoPorUsuario(authentication,10L);
+        service.excluirItemOrcamentoPorUsuario(authentication,10L);
 
-        assertFalse(orcamento.isAtivo());
+        assertFalse(itemOrcamento.isAtivo());
 
         verify(repository,times(1)).findByUsuarioAndId(any(Usuario.class),anyLong());
         verify(usuarioService,times(1)).getUsuarioLogado(any(Authentication.class));

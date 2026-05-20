@@ -1,12 +1,12 @@
-package com.api.costs.orcamento.DTO;
+package com.api.costs.itemOrcamento.DTO;
 
-import com.api.costs.orcamento.Status;
+import com.api.costs.itemOrcamento.Status;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record DadosAtulizarOrcamento(
+public record DadosAtulizarItemOrcamento(
 
         @NotNull
         Long id,

@@ -91,9 +91,15 @@
     	<groupId>org.springframework.boot</groupId>
     	<artifactId>spring-boot-starter-data-redis</artifactId>
 	</dependency>
+	<dependency>
+	  <groupId>lib</groupId>
+    	<artifactId>qrcode</artifactId>
+    	<version>1.0.0</version>
+    	<scope>system</scope>
+    	<systemPath>${project.basedir}/lib/qrcode.jar</systemPath>
+	</dependency>
+
 	</dependencies>
-
-
 	<build>
 		<plugins>
 			<plugin>

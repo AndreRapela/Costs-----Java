@@ -1,8 +1,8 @@
-package com.api.costs.orcamento;
+package com.api.costs.itemOrcamento;
 
-import com.api.costs.orcamento.DTO.DadosAtulizarOrcamento;
-import com.api.costs.orcamento.DTO.DadosCadastroOrcamento;
-import com.api.costs.orcamento.DTO.DadosCadastroOrcamentoAdmin;
+import com.api.costs.itemOrcamento.DTO.DadosAtulizarItemOrcamento;
+import com.api.costs.itemOrcamento.DTO.DadosCadastroItemOrcamento;
+import com.api.costs.itemOrcamento.DTO.DadosCadastroItemOrcamentoAdmin;
 import com.api.costs.usuario.Usuario;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -16,21 +16,21 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Table(name = "tb_orcamento")
-@Entity(name = "orcamentos")
+@Entity(name = "itemOrcamentos")
 @SQLRestriction("ativo=true")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Orcamento {
+public class ItemOrcamento {
 
-    public Orcamento(DadosCadastroOrcamentoAdmin dados) {
+    public ItemOrcamento(DadosCadastroItemOrcamentoAdmin dados) {
         this.nome = dados.nome();
         this.categoria = dados.categoria();
         this.valor = dados.valor();
         this.status = dados.status();
     }
 
-    public Orcamento(DadosCadastroOrcamento dados) {
+    public ItemOrcamento(DadosCadastroItemOrcamento dados) {
         this.nome = dados.nome();
         this.categoria = dados.categoria();
         this.valor = dados.valor();
@@ -63,7 +63,7 @@ public class Orcamento {
     @JsonIgnore
     private Usuario usuario;
 
-    public void atualizarInformacoes(@Valid DadosAtulizarOrcamento dados) {
+    public void atualizarInformacoes(@Valid DadosAtulizarItemOrcamento dados) {
 
         if (dados.nome() != null) {
             this.nome = dados.nome();

@@ -31,8 +31,6 @@ public class ParceiroService {
 
 
 
-
-
     @CacheEvict(allEntries = true)
     @Transactional
     public Parceiro cadastrarParceiro (DadosCadastroParceiroAdmin dados){
@@ -70,13 +68,13 @@ public class ParceiroService {
 
     @Cacheable("'BuscarParceirosPorNome:' + #nome + ':' + page.pageNumber + ':' + #page.pageSize")
     public  Page<DadosListarParceiroAdmin> buscarParceirosPorNome(String nome, Pageable page){
-        return repository.fingByNomeContainingIgnoreCase(nome,page).map(DadosListarParceiroAdmin::new);
+        return repository.findByNomeContainingIgnoreCase(nome,page).map(DadosListarParceiroAdmin::new);
     }
 
     @Cacheable("'BuscarParceiroPorNomePorUsuario:' + #nome + ':' + #authentication.nome + ':' #page.pageNumber + ':' + #page.pageSize ")
     public  Page<DadosListarParceiro> buscarParceiroPorNomePorUsuario(String nome, Pageable page , Authentication authentication){
         Usuario usuario = usuarioService.getUsuarioLogado(authentication);
-        return repository.findByNomeAndUsuarioContaingIgnoreCase(nome,page,usuario).map(DadosListarParceiro::new);
+        return repository.findByNomeAndUsuarioContainingIgnoreCase(nome,page,usuario).map(DadosListarParceiro::new);
     }
 
     @CacheEvict(allEntries = true)

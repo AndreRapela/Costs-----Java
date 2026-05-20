@@ -1,4 +1,4 @@
-package com.api.costs.orcamento;
+package com.api.costs.itemOrcamento;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
